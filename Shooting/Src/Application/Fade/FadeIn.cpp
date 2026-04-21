@@ -8,7 +8,7 @@ C_FadeIn::C_FadeIn()
 	m_fadeSpeed = 0.01f;
 	m_alphaMin = 0.0f;
 	m_alphaReset = 1.0f;
-	m_flg = false;
+	m_flg = true;
 }
 
 C_FadeIn::~C_FadeIn()
@@ -25,16 +25,11 @@ void C_FadeIn::Draw()
 
 void C_FadeIn::Update()
 {
-	m_fadeOut.Update();
-	if(m_fadeOut.GetFlg())
-	{
-		m_flg = true;
-		m_alpha -= m_fadeSpeed;
-	}
-
+	m_alpha -= m_fadeSpeed;
+	
 	if (m_alphaMin < m_alpha)
 	{
-		m_flg = false;
+		
 	}
 
 

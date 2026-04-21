@@ -19,6 +19,6 @@ public:
 private:
 
 	C_FadeOut* m_fadeOut = nullptr;
-	C_FadeIn * m_fadeIn = nullptr;
+	
 
 };

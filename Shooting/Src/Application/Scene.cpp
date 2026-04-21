@@ -16,10 +16,7 @@ void Scene::Update()
 		SCENEMANAGER.ChangeState(new C_TitleScene());
 	}
 
-	if (GetAsyncKeyState('G') & 0x8000)
-	{
-		SCENEMANAGER.ChangeState(new C_GameScene());
-	}
+	
 
 	if (GetAsyncKeyState('R') & 0x8000)
 	{
