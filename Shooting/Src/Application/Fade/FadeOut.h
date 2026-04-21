@@ -14,6 +14,8 @@ public:
 	void SetFlg(bool flg) { m_flg = flg; }
 	bool GetFlg() { return m_flg; }
 
+	bool GetFadeFinish() { return m_fadeFinish; }
+
 private:
 
 	Math::Vector2 m_pos;
@@ -27,6 +29,6 @@ private:
 	float m_alphaMax;
 	float m_alphaReset;
 	bool m_flg;
-	bool m_fadeFlg;
+	bool m_fadeFinish;
 
 };

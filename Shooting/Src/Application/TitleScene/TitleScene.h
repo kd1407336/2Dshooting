@@ -1,9 +1,8 @@
 #pragma once
 #include "Application/State/State.h"
-#include "Application/Fade/FadeOut.h"
 #include "Application/Fade/FadeIn.h"
 
-
+class C_FAdeOut;
 
 class C_TitleScene : public C_State
 {

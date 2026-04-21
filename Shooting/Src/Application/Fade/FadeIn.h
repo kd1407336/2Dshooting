@@ -15,6 +15,8 @@ public:
 	void SetFlg(bool flg) { m_flg = flg; }
 	bool GetFlg() { return m_flg; }
 
+	bool GetFadeFinish() { return m_fadeFinish; }
+
 private:
 
 	C_FadeOut m_fadeOut;
@@ -30,5 +32,6 @@ private:
 	float m_alphaMin;
 	float m_alphaReset;
 	bool m_flg;
+	bool m_fadeFinish;
 
 };
