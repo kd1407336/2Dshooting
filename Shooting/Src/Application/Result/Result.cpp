@@ -1,16 +1,16 @@
 #include "Result.h"
 
-void C_Result::Draw()
+void C_ResultScene::Draw()
 {
 
 }
 
-void C_Result::Update()
+void C_ResultScene::Update()
 {
 
 }
 
-void C_Result::Init()
+void C_ResultScene::Init()
 {
 
 }

@@ -23,7 +23,7 @@ void Scene::Update()
 
 	if (GetAsyncKeyState('R') & 0x8000)
 	{
-		SCENEMANAGER.ChangeState(new C_Result());
+		SCENEMANAGER.ChangeState(new C_ResultScene());
 	}
 
 }
