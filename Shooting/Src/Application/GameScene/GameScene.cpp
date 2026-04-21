@@ -1,4 +1,6 @@
 #include "GameScene.h"
+#include "Application/SceneManager/SceneManager.h"
+
 
 C_GameScene::C_GameScene()
 {
@@ -26,6 +28,12 @@ void C_GameScene::Update()
 	if (GetAsyncKeyState('K') & 0x8000)
 	{
 		m_player->SetFlg(false);
+	}
+
+	if (GetAsyncKeyState('T') & 0x8000)
+	{
+		m_fadeIn->SetFlg(true);
+		SCENEMANAGER.ChangeState(new C_TitleScene());
 	}
 
 }

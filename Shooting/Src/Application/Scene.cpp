@@ -11,13 +11,6 @@ void Scene::Update()
 {
 	SCENEMANAGER.Update();
 
-	if (GetAsyncKeyState('T') & 0x8000)
-	{
-		SCENEMANAGER.ChangeState(new C_TitleScene());
-	}
-
-	
-
 	if (GetAsyncKeyState('R') & 0x8000)
 	{
 		SCENEMANAGER.ChangeState(new C_ResultScene());
