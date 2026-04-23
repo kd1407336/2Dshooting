@@ -80,8 +80,8 @@ void C_GameScene::Update()
 
 void C_GameScene::Init()
 {
-	if (m_player)m_player->Init();
-	if (m_fadeIn)m_fadeIn->Init();
+	if (m_player) { m_player->Init(); }
+	if (m_fadeIn) { m_fadeIn->Init(); }
 	if (m_fadeOut) { m_fadeOut->Init(); }
 	m_fadeInFlg = false;
 	m_titleFadeFlg = false;

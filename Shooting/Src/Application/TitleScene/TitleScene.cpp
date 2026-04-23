@@ -6,9 +6,7 @@
 
 C_TitleScene::C_TitleScene()
 {
-	m_fadeOut = new C_FadeOut();
-	m_fadeIn = new C_FadeIn();
-	m_fadeInFlg = false;
+	
 }
 
 C_TitleScene::~C_TitleScene()
@@ -52,8 +50,11 @@ void C_TitleScene::Update()
 
 void C_TitleScene::Init()
 {
-	m_fadeOut->Init();
-	m_fadeIn->Init();
+	m_fadeOut = new C_FadeOut();
+	if (m_fadeOut) { m_fadeOut->Init(); }
+
+	m_fadeIn = new C_FadeIn();
+	if (m_fadeIn) { m_fadeIn->Init(); }
 	
 	if (SCENEMANAGER.GetRequestFadeIn())
 	{
@@ -61,5 +62,7 @@ void C_TitleScene::Init()
 		m_fadeIn->SetFlg(true);
 		SCENEMANAGER.SetRequestFadeIn(false);
 	}
+
+	m_fadeInFlg = false;
 
 }
