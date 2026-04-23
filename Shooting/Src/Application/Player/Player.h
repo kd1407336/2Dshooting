@@ -11,8 +11,8 @@ public:
 	void Update();
 	void Init();
 
-	void SetFlg(bool flg) { m_flg = flg; }
-	bool GetFlg() { return m_flg; }
+	void SetAliveFlg(bool flg) { m_aliveFlg = flg; }
+	bool GetAliveFlg() { return m_aliveFlg; }
 
 private:
 
@@ -33,6 +33,6 @@ private:
 
 
 
-	bool m_flg;
+	bool m_aliveFlg;
 
 };

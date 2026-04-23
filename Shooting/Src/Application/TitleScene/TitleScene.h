@@ -1,8 +1,8 @@
 #pragma once
 #include "Application/State/State.h"
-#include "Application/Fade/FadeIn.h"
 
-class C_FAdeOut;
+class C_FadeOut;
+class C_FadeIn;
 
 class C_TitleScene : public C_State
 {
@@ -15,9 +15,14 @@ public:
 	void Update()override;
 	void Init()override;
 
+	void SetFadeInFlg(bool fadeinflg) { m_fadeInFlg = fadeinflg; }
+	bool GetFadeInFlg() { return m_fadeInFlg; }
+
 private:
 
 	C_FadeOut* m_fadeOut = nullptr;
-	
+	C_FadeIn* m_fadeIn = nullptr;
+
+	bool m_fadeInFlg;
 
 };

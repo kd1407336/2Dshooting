@@ -31,11 +31,18 @@ public:
 		currentState->Draw();
 	}
 
+	void SetRequestFadeIn(bool requestin) { m_requestFadeIn = requestin; }
+	bool GetRequestFadeIn() { return m_requestFadeIn; }
+
+	void SetRequestFadeOut(bool requestout) { m_requestFadeOut = requestout; }
+	bool GetRequestFadeOut() { return m_requestFadeOut; }
 
 private:
 
 	C_SceneManager() {}
 	C_State* currentState = nullptr;
+	bool m_requestFadeIn = false;
+	bool m_requestFadeOut = false;
 };
 
 #define SCENEMANAGER C_SceneManager::GetInstance()

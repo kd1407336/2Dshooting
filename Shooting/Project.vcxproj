@@ -160,6 +160,7 @@
     <ClInclude Include="..\Library\tinygltf\stb_image_write.h" />
     <ClInclude Include="..\Library\tinygltf\tiny_gltf.h" />
     <ClInclude Include="Player.h" />
+    <ClInclude Include="Src\Application\Enemy\EnemyBase.h" />
     <ClInclude Include="Src\Application\Fade\FadeIn.h" />
     <ClInclude Include="Src\Application\Fade\FadeOut.h" />
     <ClInclude Include="Src\Application\GameScene\GameScene.h" />
@@ -194,6 +195,7 @@
     <ClCompile Include="..\Library\imgui\imgui_impl_win32.cpp" />
     <ClCompile Include="..\Library\imgui\imgui_widgets.cpp" />
     <ClCompile Include="Player.cpp" />
+    <ClCompile Include="Src\Application\Enemy\EnemyBase.cpp" />
     <ClCompile Include="Src\Application\Fade\FadeIn.cpp" />
     <ClCompile Include="Src\Application\Fade\FadeOut.cpp" />
     <ClCompile Include="Src\Application\GameScene\GameScene.cpp" />

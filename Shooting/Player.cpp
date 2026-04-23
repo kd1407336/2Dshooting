@@ -6,7 +6,7 @@ C_Player::C_Player()
 	m_size = { 1.0f,1.0f };
 	m_dirX = 7;
 	m_dirY = 3;
-	m_flg = true;
+	m_aliveFlg = true;
 	m_screenRight = 640;
 	m_screenLeft = -640;
 	m_screenTop = 360;
@@ -20,7 +20,7 @@ C_Player::~C_Player()
 
 void C_Player::Draw()
 {
-	if (!m_flg)return;
+	if (!m_aliveFlg)return;
 	SHADER.m_spriteShader.SetMatrix(m_mat);
 	SHADER.m_spriteShader.DrawTex(&m_tex, Math::Rectangle(0, 0, 64, 64), 1.0f);
 }

@@ -5,7 +5,7 @@ C_FadeOut::C_FadeOut()
 	m_pos = { 0,0 };
 	m_size = { 1.0f,1.0f};
 	m_alpha = 0.0f;
-	m_fadeSpeed = 0.01f;
+	m_fadeSpeed = 0.03f;
 	m_alphaMax = 1.0f;
 	m_alphaReset = 0.0f;
 	m_flg = false;
