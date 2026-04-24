@@ -67,6 +67,9 @@
     <Filter Include="Src\Application\Enemy">
       <UniqueIdentifier>{5f303331-1e9f-4d7f-8263-4995ba062971}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Src\Application\Timer">
+      <UniqueIdentifier>{28fa3c4c-e8ff-4615-9b01-08f1aec1f5ab}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Pch.h">
@@ -192,6 +195,12 @@
     <ClInclude Include="Src\Application\Enemy\EnemyBase.h">
       <Filter>Src\Application\Enemy</Filter>
     </ClInclude>
+    <ClInclude Include="Src\Application\Timer\Timer.h">
+      <Filter>Src\Application\Timer</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Application\Enemy\Enemy.h">
+      <Filter>Src\Application\Enemy</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Pch.cpp">
@@ -282,6 +291,12 @@
       <Filter>Src\Application\Result</Filter>
     </ClCompile>
     <ClCompile Include="Src\Application\Enemy\EnemyBase.cpp">
+      <Filter>Src\Application\Enemy</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Application\Timer\Timer.cpp">
+      <Filter>Src\Application\Timer</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Application\Enemy\Enemy.cpp">
       <Filter>Src\Application\Enemy</Filter>
     </ClCompile>
   </ItemGroup>

@@ -18,23 +18,20 @@ C_TitleScene::~C_TitleScene()
 void C_TitleScene::Draw()
 {
 	if (m_fadeOut ) { m_fadeOut->Draw(); }
-	if(m_fadeIn && m_fadeInFlg){m_fadeIn->Draw();}
+	if(m_fadeIn && SCENEMANAGER.GetRequestFadeIn()){m_fadeIn->Draw();}
 	
 }
 
 void C_TitleScene::Update()
 {
 	if (m_fadeOut) { m_fadeOut->Update(); }
+	if (m_fadeIn){m_fadeIn->Update();}
 
-	if (m_fadeInFlg)
+
+	if (SCENEMANAGER.GetRequestFadeIn())
 	{
-		if (m_fadeIn)
-		{
-			m_fadeIn->Update();
-		}
+		m_fadeIn->SetFlg(true);
 	}
-
-	
 
 	if (GetAsyncKeyState('G') & 0x8000)
 	{
@@ -56,12 +53,7 @@ void C_TitleScene::Init()
 	m_fadeIn = new C_FadeIn();
 	if (m_fadeIn) { m_fadeIn->Init(); }
 	
-	if (SCENEMANAGER.GetRequestFadeIn())
-	{
-		m_fadeInFlg = true;        // ★ このシーンのフェードイン開始
-		m_fadeIn->SetFlg(true);
-		SCENEMANAGER.SetRequestFadeIn(false);
-	}
+	
 
 	m_fadeInFlg = false;
 

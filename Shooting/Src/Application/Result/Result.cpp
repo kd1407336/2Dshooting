@@ -57,7 +57,6 @@ void C_ResultScene::Init()
 	m_fadeOut = new C_FadeOut();
 	if (m_fadeOut) { m_fadeOut->Init(); }
 	
-
 }
 
 void C_ResultScene::Release()
