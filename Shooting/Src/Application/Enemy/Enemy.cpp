@@ -2,8 +2,11 @@
 
 void C_Enemy::Draw()
 {
-	SHADER.m_spriteShader.SetMatrix(m_mat);
-	SHADER.m_spriteShader.DrawTex(&m_tex, Math::Rectangle(0, 0, 64, 64), 1.0f);
+	if(m_aliveFlg)
+	{
+		SHADER.m_spriteShader.SetMatrix(m_mat);
+		SHADER.m_spriteShader.DrawTex(&m_tex, Math::Rectangle(0, 0, 64, 64), 1.0f);
+	}
 }
 
 void C_Enemy::Update()
@@ -18,4 +21,5 @@ void C_Enemy::Init()
 	m_pos = { 0,100 };
 	m_size = { 1.0f,1.0f };
 	m_tex.Load("Texture/Enemy/Player.png");
+	m_aliveFlg = true;
 }

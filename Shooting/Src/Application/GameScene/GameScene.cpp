@@ -31,6 +31,8 @@ void C_GameScene::Draw()
 
 void C_GameScene::Update()
 {
+	Action();
+
 	m_fadeIn->SetFlg(true);
 
 	//プレイヤー更新
@@ -62,20 +64,6 @@ void C_GameScene::Update()
 		m_fadeOut->SetFlg(true);
 
 	}
-
-	float dx = m_player->GetPos().x - m_enemy->GetPos().x;
-	float dy = m_player->GetPos().y - m_enemy->GetPos().y;
-	float c = sqrt(dx * dx + dy * dy);
-
-	if (c < 50)
-	{
-		m_player->SetHitFlg(true);
-	}
-	else
-	{
-		m_player->SetHitFlg(false);
-	}
-
 	
 	//フェードアウト処理が終わっていたら
 	//シーンを切り替える
@@ -106,5 +94,33 @@ void C_GameScene::Init()
 	m_fadeInFlg = false;
 	m_titleFadeFlg = false;
 	m_resultFadeFlg = false;
+	m_radius = 50;
+	m_bulletRadius = 32;
+}
+
+void C_GameScene::Action()
+{
+	float dx = m_player->GetPos().x - m_enemy->GetPos().x;
+	float dy = m_player->GetPos().y - m_enemy->GetPos().y;
+	float c = sqrt(dx * dx + dy * dy);
+
+	if (c < m_radius)
+	{
+		m_player->SetHitFlg(true);
+
+	}
+	else
+	{
+		m_player->SetHitFlg(false);
+	}
+
+	float bx = m_player->GetBulletPos().x - m_enemy->GetPos().x;
+	float by = m_player->GetBulletPos().y - m_enemy->GetPos().y;
+	float bc = sqrt(bx * bx + by * by);
+
+	if (bc < m_bulletRadius)
+	{
+		m_enemy->SetAliveFlg(false);
+	}
 
 }

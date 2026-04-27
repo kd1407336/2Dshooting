@@ -20,6 +20,7 @@ public:
 
 	bool GetFadeInFlg() { return m_fadeInFlg; }
 
+	void Action();
 	
 
 private:
@@ -33,7 +34,8 @@ private:
 	bool m_resultFadeFlg;
 	bool m_titleFadeFlg;
 
-	
+	int m_radius;
+	int m_bulletRadius;
 
 
 };

@@ -70,6 +70,9 @@
     <Filter Include="Src\Application\Timer">
       <UniqueIdentifier>{28fa3c4c-e8ff-4615-9b01-08f1aec1f5ab}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Src\Application\Bullet">
+      <UniqueIdentifier>{3e5fe542-dd01-429a-af14-28440a115492}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Pch.h">

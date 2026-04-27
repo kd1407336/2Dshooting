@@ -15,6 +15,9 @@ public:
 	void SetPos(Math::Vector2 pos) { m_pos = pos; }
 	Math::Vector2 GetPos() { return m_pos; }
 
+	void SetAliveFlg(bool aliveFlg) { m_aliveFlg = aliveFlg; }
+	bool GetAliveFlg() { return m_aliveFlg; }
+
 private:
 
 	
