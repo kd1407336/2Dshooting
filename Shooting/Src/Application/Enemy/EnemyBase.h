@@ -9,6 +9,7 @@ public:
 	virtual void Draw();
 	virtual void Update();
 	virtual void Init();
+	virtual void Action();
 
 protected:
 
@@ -19,4 +20,5 @@ protected:
 	Math::Matrix m_scale;
 	KdTexture m_tex;
 	bool m_aliveFlg;
+	bool m_hitFlg;
 };

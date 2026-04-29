@@ -3,12 +3,12 @@
 #include "Application/Fade/FadeOut.h"
 #include "Application/Enemy/Enemy.h"
 
+
 C_GameScene::C_GameScene()
 {
 	m_player = new C_Player();
 	m_fadeIn = new C_FadeIn();
 	m_fadeOut = new C_FadeOut();
-	m_enemy = new C_Enemy();
 }
 
 C_GameScene::~C_GameScene()
@@ -16,14 +16,35 @@ C_GameScene::~C_GameScene()
 	if (m_player) { delete m_player; m_player = nullptr; }
 	if (m_fadeIn) { delete m_fadeIn; m_fadeIn = nullptr; }
 	if (m_fadeOut) { delete m_fadeOut; m_fadeOut = nullptr; }
-	if (m_enemy) { delete m_enemy;m_enemy = nullptr; }
+
+	for (auto it = m_enemies.begin();it != m_enemies.end();)
+	{
+		if (!(*it)->GetAliveFlg())
+		{
+			it = m_enemies.erase(it);
+		}
+		else
+		{
+			it++;
+		}
+	}
+
 }
 
 void C_GameScene::Draw()
 {
 	//プレイヤー
 	if (m_player) { m_player->Draw(); }
-	if (m_enemy) { m_enemy->Draw(); }
+
+	for (int i = 0; i < m_scoreMax; i++)
+	{
+		m_score[i].Draw();
+	}
+
+	for (auto& e : m_enemies)
+	{
+		e->Draw();
+	}
 
 	if (m_fadeIn) { m_fadeIn->Draw(); }
 	if (m_fadeOut) { m_fadeOut->Draw(); }
@@ -37,7 +58,20 @@ void C_GameScene::Update()
 
 	//プレイヤー更新
 	if (m_player) { m_player->Update(); }
-	if (m_enemy) { m_enemy->Update(); }
+
+	for (int i = 0; i < m_scoreMax; i++)
+	{
+		m_score[i].Update();
+	}
+
+	for (auto& e : m_enemies)
+	{
+		if (e->GetAliveFlg())
+		{
+			e->Update();
+		}
+	}
+
 	
 	//フェードイン更新
 	if(m_fadeIn->GetFlg()){m_fadeIn->Update();}
@@ -88,39 +122,107 @@ void C_GameScene::Update()
 void C_GameScene::Init()
 {
 	if (m_player) { m_player->Init(); }
-	if (m_enemy) { m_enemy->Init(); }
 	if (m_fadeIn) { m_fadeIn->Init(); }
 	if (m_fadeOut) { m_fadeOut->Init(); }
+
+	for (int i = 0; i < m_scoreMax; i++)
+	{
+		m_score[i].Init();
+	}
+
+	m_enemies.clear();
+
+	std::random_device rd;
+	std::mt19937 mt(rd());
+	std::uniform_int_distribution<int> distX(-610, 610);
+
+	const float MIN_DIST = 64.0f; // 敵同士の最低限空けたい距離（敵の幅くらい）
+
+	for (int i = 0; i < 10; i++)
+	{
+		float randX;
+		bool isOverlapping;
+
+		// --- 重ならない場所が見つかるまでループ ---
+		do {
+			isOverlapping = false;
+			randX = (float)distX(mt);
+
+			// すでにリストにいる敵と順番に比較
+			for (const auto& e : m_enemies) {
+				if (std::abs(randX - e->GetPos().x) < MIN_DIST) {
+					isOverlapping = true; // 重なった！
+					break;
+				}
+			}
+		} while (isOverlapping);
+		// ---------------------------------------
+
+		auto enemy = std::make_unique<C_Enemy>();
+		enemy->Init();
+		enemy->SetPos({ randX, 300.0f });
+		m_enemies.push_back(std::move(enemy));
+	}
+
 	m_fadeInFlg = false;
 	m_titleFadeFlg = false;
 	m_resultFadeFlg = false;
 	m_radius = 50;
-	m_bulletRadius = 32;
+	m_bulletRadius = 16;
+	m_enemyRadius = 32;
+	m_maxEnemies = 10;
 }
 
 void C_GameScene::Action()
 {
-	float dx = m_player->GetPos().x - m_enemy->GetPos().x;
-	float dy = m_player->GetPos().y - m_enemy->GetPos().y;
-	float c = sqrt(dx * dx + dy * dy);
-
-	if (c < m_radius)
+	for (auto& e : m_enemies)
 	{
-		m_player->SetHitFlg(true);
+		if (!e->GetAliveFlg()) continue;
 
+		// プレイヤーと敵の当たり判定
+		float dx = m_player->GetPos().x - e->GetPos().x;
+		float dy = m_player->GetPos().y - e->GetPos().y;
+		float c = sqrt(dx * dx + dy * dy);
+
+		if (c < m_radius)
+		{
+			if (!m_player->GetHitFlg())
+			{
+				m_player->Damage();
+				m_player->StartInvincible();
+			}
+		}
+
+		// 弾と敵の当たり判定
+		for (auto& b : m_player->GetBullets())
+		{
+			if (!b.active) continue;
+
+			float bx = b.pos.x - e->GetPos().x;
+			float by = b.pos.y - e->GetPos().y;
+			float bc = sqrt(bx * bx + by * by);
+
+			if (bc < m_bulletRadius + m_enemyRadius)
+			{
+				b.active = false;
+				e->SetAliveFlg(false);
+
+				// --- スコアを複数出す処理に書き換え ---
+				for (auto& s : m_score) // 配列の中から探す
+				{
+					if (!s.GetScoreFlg())
+					{
+						s.SetPos(e->GetPos());   // 敵の場所に配置
+						s.SetScore(100);
+						s.SetScoreFlg(true);
+
+						break; 
+					}
+				}
+				// --------------------------------------
+
+				break;
+			}
+		}
 	}
-	else
-	{
-		m_player->SetHitFlg(false);
-	}
-
-	float bx = m_player->GetBulletPos().x - m_enemy->GetPos().x;
-	float by = m_player->GetBulletPos().y - m_enemy->GetPos().y;
-	float bc = sqrt(bx * bx + by * by);
-
-	if (bc < m_bulletRadius)
-	{
-		m_enemy->SetAliveFlg(false);
-	}
-
 }

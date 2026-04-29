@@ -22,4 +22,10 @@ void C_Enemy::Init()
 	m_size = { 1.0f,1.0f };
 	m_tex.Load("Texture/Enemy/Player.png");
 	m_aliveFlg = true;
+	m_hitFlg = false;
+}
+
+void C_Enemy::Action()
+{
+	
 }

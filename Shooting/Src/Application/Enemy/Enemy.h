@@ -11,6 +11,7 @@ public:
 	void Draw()override;
 	void Update()override;
 	void Init()override;
+	void Action()override;
 
 	void SetPos(Math::Vector2 pos) { m_pos = pos; }
 	Math::Vector2 GetPos() { return m_pos; }
@@ -18,7 +19,11 @@ public:
 	void SetAliveFlg(bool aliveFlg) { m_aliveFlg = aliveFlg; }
 	bool GetAliveFlg() { return m_aliveFlg; }
 
+	void SetHitFlg(bool hitFlg) { m_hitFlg = hitFlg; }
+	bool GetHitFlg() { return m_hitFlg; }
+
 private:
 
 	
+
 };

@@ -2,6 +2,12 @@
 
 //class C_GameScene;
 
+struct Bullet
+{
+	Math::Vector2 pos;
+	bool active = true;
+};
+
 class C_Player
 {
 public:
@@ -34,10 +40,13 @@ public:
 	void SetHitFlg(bool hitFlg) { m_hitFlg = hitFlg; }
 	bool GetHitFlg() { return m_hitFlg; }
 
-	void SetHitOnFlg(bool hitOnFlg) { m_hitOnFlg = hitOnFlg; }
-	bool GetHitOnFlg() { return m_hitOnFlg; }
+	void Damage();
 
-	Math::Vector2 GetBulletPos() { return m_pos; }
+	Math::Vector2 GetBulletPos() { return m_bulletPos; }
+
+	std::vector<Bullet>& C_Player::GetBullets(){return m_bullets;}
+
+	void StartInvincible();
 
 private:
 
@@ -65,6 +74,10 @@ private:
 	Math::Matrix m_bulletScale;
 	KdTexture m_bulletTex;
 	bool m_bulletFlg = false;
+	int m_shotInterval;
+	int m_shotIntervalMax;
+
+	std::vector<Bullet> m_bullets;
 
 	int m_dirX;
 	int m_dirY;
@@ -98,6 +111,8 @@ private:
 	int m_charaRadius;
 
 	
+	float m_invincibleTime;
+	float m_invincibleMax;
 
 
 };
