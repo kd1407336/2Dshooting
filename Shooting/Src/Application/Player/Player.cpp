@@ -1,11 +1,33 @@
-#include "Player.h"
+#include "Application/Player/Player.h"
+#include "Application/GameScene/GameScene.h"
 
 C_Player::C_Player()
 {
 	m_pos = { 0,0 };
 	m_size = { 1.0f,1.0f };
-	m_dirX = 3;
+	m_dirX = 7;
 	m_dirY = 3;
+	
+	m_screenRight = 640;
+	m_screenLeft = -640;
+	m_screenTop = 360;
+	m_screenDown = -360;
+
+	m_hp = 10;
+	m_hpMax = 10;
+	m_hpDraw = 10.0f;
+
+	m_alpha = 1.0f;
+	m_alphaMin = 0.3f;
+	m_alphaMax = 1.0f;
+	m_alphaReset = 1.0f;
+	m_delet = 0.0f;
+
+	m_charaRadius = 32;
+	
+	m_aliveFlg = true;
+	m_hitFlg = false;
+	m_hitOnFlg = false;
 }
 
 C_Player::~C_Player()
@@ -15,12 +37,40 @@ C_Player::~C_Player()
 
 void C_Player::Draw()
 {
+	if (!m_aliveFlg)return;
 	SHADER.m_spriteShader.SetMatrix(m_mat);
-	SHADER.m_spriteShader.DrawTex(&m_tex, Math::Rectangle(0, 0, 64, 64), 1.0f);
+	SHADER.m_spriteShader.DrawTex(&m_tex, Math::Rectangle(0, 0, 64, 64),m_alpha);
+
+	HpDraw();
+	BulletDraw();
+
 }
 
 void C_Player::Update()
 {
+	
+	Action();
+	HpUpdate();
+	BulletUpdate();
+
+	m_trans = Math::Matrix::CreateTranslation(m_pos.x, m_pos.y, 0);
+	m_scale = Math::Matrix::CreateScale(m_size.x, m_size.y, 0);
+	m_mat = m_scale * m_trans;
+}
+
+void C_Player::Init()
+{
+	m_tex.Load("Texture/Player/Player.png");
+	HpInit();
+	BulletInit();
+
+	m_invincibleTime = 0.0f;
+	m_invincibleMax = 1.5f; // 無敵時間（1秒など）
+}
+
+void C_Player::Action()
+{
+	//プレイヤー移動処理
 	if (GetAsyncKeyState(VK_LEFT) & 0x8000)
 	{
 		m_pos.x -= m_dirX;
@@ -41,12 +91,180 @@ void C_Player::Update()
 		m_pos.y -= m_dirY;
 	}
 
-	m_trans = Math::Matrix::CreateTranslation(m_pos.x, m_pos.y, 0);
-	m_scale = Math::Matrix::CreateScale(m_size.x, m_size.y, 0);
-	m_mat = m_scale * m_trans;
+	//画面端当たり判定
+	if (m_pos.x > m_screenRight - m_charaRadius)
+	{
+		m_pos.x = m_screenRight - m_charaRadius;
+	}
+
+	if (m_pos.x < m_screenLeft + m_charaRadius)
+	{
+		m_pos.x = m_screenLeft + m_charaRadius;
+	}
+
+	if (GetAsyncKeyState('K') & 0x8000)
+	{
+		m_aliveFlg = false;
+	}
+
+
+
+	if (m_hitFlg)
+	{
+		m_alpha += m_delet;
+
+		if (m_alpha <= m_alphaMin)
+		{
+			m_alpha = m_alphaMin;
+			m_delet = 0.05f;
+		}
+		else if (m_alpha >= m_alphaMax)
+		{
+			m_alpha = m_alphaMax;
+			m_delet -= 0.05f;
+		}
+
+
+		
+		m_invincibleTime -= 0.016f; 
+
+		if (m_invincibleTime <= 0.0f)
+		{
+			m_hitFlg = false;        // 無敵終了
+			m_invincibleTime = 0.0f;
+		}
+
+
+	}
+	else
+	{
+		m_alpha = m_alphaReset;
+	}
 }
 
-void C_Player::Init()
+void C_Player::HpDraw()
 {
-	m_tex.Load("Player.png");
+	SHADER.m_spriteShader.SetMatrix(m_hpMat);
+	Math::Rectangle rect = { 0,0,271,21 };
+	Math::Color hpColor = { 0.0f,1.0f,0.0f,1.0f };
+	SHADER.m_spriteShader.DrawTex(&m_hpTex, 0, 0, &rect, &hpColor);
+}
+
+void C_Player::HpUpdate()
+{
+	//HPが徐々に減るようにする
+	if (m_hpDraw > m_hp)
+	{
+		m_hpDraw -= 0.3f;
+
+		if (m_hpDraw < m_hp)
+		{
+			m_hpDraw = m_hp;
+		}
+
+	}
+
+	//HP割合を計算
+	float HpRate = m_hpDraw / m_hpMax;
+	if (HpRate < 0.0f) { HpRate = 0.0f; }
+	else if (HpRate > 1.0f) { HpRate = 1.0f; }
+
+	m_hpSize.x = HpRate;
+
+	m_hpTrans = Math::Matrix::CreateTranslation(m_hpPos.x, m_hpPos.y, 0);
+	m_hpScale = Math::Matrix::CreateScale(m_hpSize.x, m_hpSize.y, 0);
+	m_hpMat = m_hpScale * m_hpTrans;
+}
+
+void C_Player::HpInit()
+{
+	m_hpPos = { -200,250 };
+	m_hpSize = { 1.0f,1.0f };
+	m_hpTex.Load("Texture/HpBer/HpBer.png");
+}
+
+void C_Player::BulletDraw()
+{
+	for (auto& b : m_bullets)
+	{
+		if (!b.active) continue;
+
+		// ★ Update の m_bulletScale をそのまま使う
+		Math::Matrix trans = Math::Matrix::CreateTranslation(b.pos.x, b.pos.y, 0);
+		Math::Matrix mat = m_bulletScale * trans;
+
+		SHADER.m_spriteShader.SetMatrix(mat);
+		SHADER.m_spriteShader.DrawTex(&m_bulletTex, Math::Rectangle(0, 0, 16, 16), 1.0f);
+	}
+}
+
+void C_Player::BulletUpdate()
+{
+
+	if (m_shotInterval > 0)
+	{
+		m_shotInterval--;
+	}
+
+	if (GetAsyncKeyState(VK_SPACE) & 0x8000)
+	{
+		if (m_shotInterval == 0)
+		{
+			Bullet b;
+			b.pos = m_pos;
+			b.pos.y += 10;
+			b.active = true;
+
+			m_bullets.push_back(b);
+
+			m_shotInterval = m_shotIntervalMax; // ★ クールタイムをリセット
+		}
+		
+	}
+
+	for (auto& b : m_bullets)
+	{
+		if (!b.active) continue;
+
+		b.pos.y += 7;
+
+		if (b.pos.y >= 390)
+		{
+			b.active = false;
+		}
+	}
+
+	// ③ ★ active=false の弾を削除（ここが今回の答え）
+	m_bullets.erase(
+	std::remove_if(m_bullets.begin(),m_bullets.end(),
+	[](const Bullet& b) { return !b.active; }
+		),
+		m_bullets.end()
+	);
+
+	m_bulletTrans = Math::Matrix::CreateTranslation(m_bulletPos.x, m_bulletPos.y, 0);
+	m_bulletScale = Math::Matrix::CreateScale(m_bulletSize.x, m_bulletSize.y ,0);
+	m_bulletMat = m_bulletScale * m_bulletTrans;
+
+}
+
+void C_Player::BulletInit()
+{
+	m_bulletPos ={ 0,0 };
+	m_bulletSize = { 1.0f,1.0f };
+	m_shotInterval = 0;
+	m_shotIntervalMax = 10;
+	m_bulletTex.Load("Texture/Bullet/Bullet.png");
+	m_bulletFlg = false;
+}
+
+void C_Player::Damage()
+{
+	m_hp = m_hp - 1;
+}
+
+void C_Player::StartInvincible()
+{
+	m_hitFlg = true;                 // 点滅開始
+	m_invincibleTime = m_invincibleMax;
 }

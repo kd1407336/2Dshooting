@@ -8,28 +8,32 @@
 class C_Enemy;
 class C_FadeOut;
 class C_TitleScene;
+class C_Timer;
 
 class C_GameScene : public C_State
 {
 public:
 	C_GameScene();
-	~C_GameScene();
+	~C_GameScene()override;
 
 	void Draw() override;
 	void Update() override;
 	void Init() override;
 
+	
 
 	bool GetFadeInFlg() { return m_fadeInFlg; }
 
 	void Action()override;
-	
+	void TimerUpdate()override;
+	void ScoreUpdate()override;
 
 private:
 
 	C_Player* m_player = nullptr;
 	C_FadeIn* m_fadeIn = nullptr;
 	C_FadeOut* m_fadeOut = nullptr;
+	C_Timer* m_timer = nullptr;
 
 	static const int m_scoreMax = 11;
 	C_Score m_score[m_scoreMax];
@@ -45,5 +49,9 @@ private:
 	int m_enemyRadius;
 
 	int m_maxEnemies;
+
+	int m_killPoint;
+	int m_totalScore;
+	int m_displayScore;
 
 };

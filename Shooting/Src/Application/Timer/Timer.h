@@ -11,6 +11,8 @@ public:
 	void Update();
 	void Init();
 
+	void SetTimerFlg(bool timerFlg) { m_timerFlg = timerFlg; }
+	bool GetTimerFlg() { return m_timerFlg; }
 
 private:
 
@@ -21,5 +23,10 @@ private:
 	Math::Matrix m_scale;
 	KdTexture m_tex;
 
+	unsigned long m_timer;
+	int m_timerLimit;
+	int m_timerCnt;
+	int m_timerReset;
+	bool m_timerFlg;
 
 };

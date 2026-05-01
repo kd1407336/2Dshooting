@@ -9,7 +9,7 @@ class C_ResultScene : public C_State
 public:
 
 	C_ResultScene(){}
-	~C_ResultScene() { Release(); }
+	~C_ResultScene()override { Release(); }
 	
 	void Draw();
 	void Update();

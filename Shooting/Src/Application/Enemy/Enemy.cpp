@@ -11,6 +11,7 @@ void C_Enemy::Draw()
 
 void C_Enemy::Update()
 {
+
 	m_trans = Math::Matrix::CreateTranslation(m_pos.x, m_pos.y, 0);
 	m_scale = Math::Matrix::CreateScale(m_size.x, m_size.y, 0);
 	m_mat = m_scale * m_trans;
@@ -18,7 +19,7 @@ void C_Enemy::Update()
 
 void C_Enemy::Init()
 {
-	m_pos = { 0,100 };
+	m_pos = { 0,0 };
 	m_size = { 1.0f,1.0f };
 	m_tex.Load("Texture/Enemy/Player.png");
 	m_aliveFlg = true;

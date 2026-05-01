@@ -76,6 +76,9 @@
     <Filter Include="Src\Application\Score">
       <UniqueIdentifier>{d35e767e-9ac4-4da0-9f94-0f7a05f6ec54}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Src\Application\MouseManager">
+      <UniqueIdentifier>{e83d7472-3c9b-44e3-8ad8-7e8bb84269d6}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Pch.h">
@@ -177,9 +180,6 @@
     <ClInclude Include="Src\Application\SceneManager\SceneManager.h">
       <Filter>Src\Application\SceneManager</Filter>
     </ClInclude>
-    <ClInclude Include="Player.h">
-      <Filter>Src</Filter>
-    </ClInclude>
     <ClInclude Include="Src\Application\Player\Player.h">
       <Filter>Src\Application\Player</Filter>
     </ClInclude>
@@ -209,6 +209,9 @@
     </ClInclude>
     <ClInclude Include="Src\Application\Score\Score.h">
       <Filter>Src\Application\Score</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Application\MouseManager\MouseManager.h">
+      <Filter>Src\Application\MouseManager</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -278,9 +281,6 @@
     <ClCompile Include="Src\Application\GameScene\GameScene.cpp">
       <Filter>Src\Application\GameScene</Filter>
     </ClCompile>
-    <ClCompile Include="Player.cpp">
-      <Filter>Src</Filter>
-    </ClCompile>
     <ClCompile Include="Src\Application\State\State.cpp">
       <Filter>Src\Application\State</Filter>
     </ClCompile>
@@ -310,6 +310,9 @@
     </ClCompile>
     <ClCompile Include="Src\Application\Score\Score.cpp">
       <Filter>Src\Application\Score</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Application\MouseManager\MouseManager.cpp">
+      <Filter>Src\Application\MouseManager</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

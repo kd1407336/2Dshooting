@@ -10,6 +10,10 @@ public:
 	void Update();
 	void Init();
 
+	void UiDraw(int _totalScore);
+	void UiUpdate();
+	void UiInit();
+
 	void SetPos(Math::Vector2 pos) { m_pos = pos; }
 	Math::Vector2 GetPos() { return m_pos; }
 
@@ -21,6 +25,7 @@ public:
 
 private:
 
+	//エフェクト用UI
 	Math::Vector2 m_pos;
 	Math::Vector2 m_size;
 	Math::Matrix m_mat;
@@ -28,10 +33,22 @@ private:
 	Math::Matrix m_trans;
 	KdTexture m_tex;
 
-	int m_score;
+	//スコア合計値用UI
+	Math::Vector2 m_uiPos; 
+	Math::Vector2 m_uiSize;
+	Math::Matrix  m_uiScaleMat;
+	Math::Matrix  m_uiTransMat;
+	Math::Matrix  m_uiMat;
+	float         m_uiAlpha;  
+
+	unsigned long m_score;
 	int m_scoreTimer;
 	int m_timerLimit;
 	int m_timerReset;
+	float m_alpha;
+	float m_alphaReset;
+
+	float m_upSpeed;
 
 	bool m_scoreFlg;
 

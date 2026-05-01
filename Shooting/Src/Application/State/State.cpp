@@ -12,3 +12,11 @@ void C_State::Action()
 {
 
 }
+
+void C_State::TimerUpdate()
+{
+}
+
+void C_State::ScoreUpdate()
+{
+}
