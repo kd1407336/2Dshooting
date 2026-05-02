@@ -79,6 +79,9 @@
     <Filter Include="Src\Application\MouseManager">
       <UniqueIdentifier>{e83d7472-3c9b-44e3-8ad8-7e8bb84269d6}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Src\Application\HomeIcon">
+      <UniqueIdentifier>{d1716ea9-1b1e-4d93-b0b3-b6c36d59242f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Pch.h">
@@ -213,6 +216,12 @@
     <ClInclude Include="Src\Application\MouseManager\MouseManager.h">
       <Filter>Src\Application\MouseManager</Filter>
     </ClInclude>
+    <ClInclude Include="Src\Application\Fade\Fade.h">
+      <Filter>Src\Application\Fade</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Application\HomeIcon\HomeIcon.h">
+      <Filter>Src\Application\HomeIcon</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Pch.cpp">
@@ -313,6 +322,12 @@
     </ClCompile>
     <ClCompile Include="Src\Application\MouseManager\MouseManager.cpp">
       <Filter>Src\Application\MouseManager</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Application\Fade\Fade.cpp">
+      <Filter>Src\Application\Fade</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Application\HomeIcon\HomeIcon.cpp">
+      <Filter>Src\Application\HomeIcon</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
