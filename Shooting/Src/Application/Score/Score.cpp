@@ -31,6 +31,8 @@ void C_Score::Draw()
         }
     }
 
+    ScoreDraw();
+
 }
 
 void C_Score::Update()
@@ -51,6 +53,7 @@ void C_Score::Update()
     }
 
     UiUpdate();
+    ScoreUpdate();
 
 	m_trans = Math::Matrix::CreateTranslation(m_pos.x, m_pos.y, 0);
 	m_scale = Math::Matrix::CreateScale(m_size.x, m_size.y, 0);
@@ -72,6 +75,7 @@ void C_Score::Init()
     m_scoreFlg = false;
 
     UiInit();
+    ScoreInit();
 
 }
 
@@ -112,7 +116,28 @@ void C_Score::UiUpdate()
 void C_Score::UiInit()
 {
     // 合計スコアUIの初期設定
-    m_uiPos = { 460.0f, 320.0f };
+    m_uiPos = { 460.0f, 150.0f };
     m_uiSize = { 1.0f,1.0f };
     m_uiAlpha = 1.0f;
+}
+
+void C_Score::ScoreDraw()
+{
+    SHADER.m_spriteShader.SetMatrix(m_scoreMat);
+    // 描画
+    SHADER.m_spriteShader.DrawTex(&m_scoreTex,Math::Rectangle(0,0,69,50),1.0f);
+}
+
+void C_Score::ScoreUpdate()
+{
+    m_scoreTrans = Math::Matrix::CreateTranslation(m_scorePos.x, m_scorePos.y, 0);
+    m_scoreScale = Math::Matrix::CreateScale(m_scoreSize.x, m_scoreSize.y, 0);
+    m_scoreMat = m_scoreScale * m_scoreTrans;
+}
+
+void C_Score::ScoreInit()
+{
+    m_scorePos = { 500,180 };
+    m_scoreSize = { 1.7f,1.7f };
+    m_scoreTex.Load("Texture/Score/Score.png");
 }

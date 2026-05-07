@@ -1,4 +1,7 @@
 #pragma once
+
+class C_EnemyBullet;
+
 class C_EnemyBase
 {
 public:
@@ -10,6 +13,7 @@ public:
 	virtual void Update();
 	virtual void Init();
 	virtual void Action();
+	virtual void Shoot(std::vector<std::unique_ptr<C_EnemyBullet>>& bulletList);
 
 protected:
 
@@ -21,4 +25,7 @@ protected:
 	KdTexture m_tex;
 	bool m_aliveFlg;
 	bool m_hitFlg;
+
+	int m_shotTimer = 0;
+
 };

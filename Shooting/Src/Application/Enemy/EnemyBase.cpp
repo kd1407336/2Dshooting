@@ -1,5 +1,5 @@
 #include "EnemyBase.h"
-
+#include "Application/EnemyBullet/EnemyBullet.h"
 
 void C_EnemyBase::Draw()
 {
@@ -17,6 +17,11 @@ void C_EnemyBase::Init()
 }
 
 void C_EnemyBase::Action()
+{
+	return;
+}
+
+void C_EnemyBase::Shoot(std::vector<std::unique_ptr<C_EnemyBullet>>& bulletList)
 {
 	return;
 }

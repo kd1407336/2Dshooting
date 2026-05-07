@@ -1,5 +1,8 @@
 #pragma once
 #include "EnemyBase.h"
+#include <vector>
+
+class C_EnemyBullet;
 
 class C_Enemy : public C_EnemyBase
 {
@@ -12,6 +15,7 @@ public:
 	void Update()override;
 	void Init()override;
 	void Action()override;
+	void Shoot(std::vector<std::unique_ptr<C_EnemyBullet>>& bulletList)override;
 
 	void SetPos(Math::Vector2 pos) { m_pos = pos; }
 	Math::Vector2 GetPos() { return m_pos; }
@@ -22,8 +26,13 @@ public:
 	void SetHitFlg(bool hitFlg) { m_hitFlg = hitFlg; }
 	bool GetHitFlg() { return m_hitFlg; }
 
+	bool IsDead() const { return !m_aliveFlg; }
+	void Reset(float x, float y);
+
+	
 private:
 
 	
+
 
 };

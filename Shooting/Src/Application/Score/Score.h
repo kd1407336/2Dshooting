@@ -14,6 +14,10 @@ public:
 	void UiUpdate();
 	void UiInit();
 
+	void ScoreDraw();
+	void ScoreUpdate();
+	void ScoreInit();
+
 	void SetPos(Math::Vector2 pos) { m_pos = pos; }
 	Math::Vector2 GetPos() { return m_pos; }
 
@@ -40,6 +44,14 @@ private:
 	Math::Matrix  m_uiTransMat;
 	Math::Matrix  m_uiMat;
 	float         m_uiAlpha;  
+
+	//スコア文字用
+	Math::Vector2 m_scorePos;
+	Math::Vector2 m_scoreSize;
+	Math::Matrix m_scoreMat;
+	Math::Matrix m_scoreTrans;
+	Math::Matrix m_scoreScale;
+	KdTexture m_scoreTex;
 
 	unsigned long m_score;
 	int m_scoreTimer;

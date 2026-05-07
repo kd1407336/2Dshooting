@@ -20,3 +20,8 @@ void C_State::TimerUpdate()
 void C_State::ScoreUpdate()
 {
 }
+
+void C_State::HomeIconUpdate()
+{
+}
+

@@ -14,6 +14,7 @@ public:
 	virtual void Action();
 	virtual void TimerUpdate();
 	virtual void ScoreUpdate();
+	virtual void HomeIconUpdate();
 
 protected:
 
