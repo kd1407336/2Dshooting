@@ -37,4 +37,9 @@ private:
 	Math::Matrix m_startTrans;
 	KdTexture m_startTex;
 
+	float m_alpha;;
+	float m_alphaMax;
+	float m_alphaMin;
+	float m_delet;
+
 };

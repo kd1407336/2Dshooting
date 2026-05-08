@@ -35,7 +35,7 @@ void C_Enemy::Init()
 	m_pos = { 0,0 };
 	m_size = { 1.0f,1.0f };
 	m_shotTimer = 0;
-	m_tex.Load("Texture/Enemy/Player.png");
+	m_tex.Load("Texture/Enemy/Enemy.png");
 	m_aliveFlg = true;
 	m_hitFlg = false;
 }

@@ -8,9 +8,10 @@
 
 class C_Enemy;
 class C_BossEnemy;
-class C_EnemyBullet;
-class C_EnemyBullet;
 class C_BossBullet;
+class C_EnemyBullet;
+class C_EnemyBullet;
+class C_Explosion;
 class C_FadeOut;
 class C_HomeIcon;
 class C_Level;
@@ -39,14 +40,18 @@ public:
 
 private:
 
-	C_Player* m_player = nullptr;
-	C_FadeIn* m_fadeIn = nullptr;
-	C_FadeOut* m_fadeOut = nullptr;
-	C_Timer* m_timer = nullptr;
-	C_HomeIcon* m_homeIcon= nullptr;
-	C_Level* m_level = nullptr;
-	C_BossEnemy* m_bEnemy = nullptr;
+	C_Player*		m_player = nullptr;
+	C_FadeIn*		m_fadeIn = nullptr;
+	C_FadeOut*		m_fadeOut = nullptr;
+	C_Timer*		m_timer = nullptr;
+	C_HomeIcon*		m_homeIcon= nullptr;
+	C_Level*		m_level = nullptr;
+	C_BossEnemy*	m_bEnemy = nullptr;
 
+	// îöî≠ÇÃç≈ëÂêîÅiâÊñ ì‡Ç…ìØéûÇ…èoÇπÇÈêîÅj
+	static const int m_explosionMax = 10;
+
+	std::vector<std::unique_ptr<C_Explosion>> m_explosions;
 	std::vector<std::unique_ptr<C_EnemyBullet>> m_enemyBullets;
 	std::vector<std::unique_ptr<C_BossBullet>> m_bossBullets;
 	static const int m_scoreMax = 11;
@@ -64,6 +69,7 @@ private:
 	int m_charaRadius; 
 	int m_bulletRadius;
 	int m_enemyRadius;
+	int m_bossRadius;
 	int m_iconRadius;
 
 	int m_maxEnemies;

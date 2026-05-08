@@ -164,6 +164,7 @@
     <ClInclude Include="Src\Application\Enemy\BossEnemy.h" />
     <ClInclude Include="Src\Application\Enemy\Enemy.h" />
     <ClInclude Include="Src\Application\Enemy\EnemyBase.h" />
+    <ClInclude Include="Src\Application\Explosion\Explosion.h" />
     <ClInclude Include="Src\Application\Fade\Fade.h" />
     <ClInclude Include="Src\Application\Fade\FadeIn.h" />
     <ClInclude Include="Src\Application\Fade\FadeOut.h" />
@@ -208,6 +209,7 @@
     <ClCompile Include="Src\Application\Enemy\BossEnemy.cpp" />
     <ClCompile Include="Src\Application\Enemy\Enemy.cpp" />
     <ClCompile Include="Src\Application\Enemy\EnemyBase.cpp" />
+    <ClCompile Include="Src\Application\Explosion\Explosion.cpp" />
     <ClCompile Include="Src\Application\Fade\Fade.cpp" />
     <ClCompile Include="Src\Application\Fade\FadeIn.cpp" />
     <ClCompile Include="Src\Application\Fade\FadeOut.cpp" />

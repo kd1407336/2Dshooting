@@ -69,29 +69,48 @@ void C_TitleScene::Init()
 void C_TitleScene::StartDraw()
 {
 	SHADER.m_spriteShader.SetMatrix(m_startMat);
-	SHADER.m_spriteShader.DrawTex(&m_startTex, Math::Rectangle(0, 0, 69, 50), 1.0f);
+	SHADER.m_spriteShader.DrawTex(&m_startTex, Math::Rectangle(0, 0, 69, 50), m_alpha);
 }
 
 void C_TitleScene::StartUpdate()
 {
-	float dx = m_startPos.x - g_mouse.GetPos().x;
+
+	m_alpha += m_delet;
+
+	if (m_alpha >= m_alphaMax)
+	{
+		m_alpha = m_alphaMax;
+		m_alpha -= m_delet;
+	}
+
+	if (m_alpha <= m_alphaMin)
+	{
+		m_alpha = m_alphaMin;
+		m_alpha = m_delet;
+	}
+
+
+	if (GetAsyncKeyState(VK_RETURN) & 0x8000)
+	{
+		m_fadeOut->SetFlg(true);
+	}
+
+	/*float dx = m_startPos.x - g_mouse.GetPos().x;
 	float dy = m_startPos.y - g_mouse.GetPos().y;
 	float c = sqrt(dx * dx + dy * dy);
+
 
 	if (c < 40)
 	{
 		m_startSize = { 2.5f,2.5f };
 
-		if (GetAsyncKeyState(VK_LBUTTON) & 0x8000)
-		{
-			m_fadeOut->SetFlg(true);
-		}
+	
 
 	}
 	else
 	{
 		m_startSize = { 1.7f,1.7f };
-	}
+	}*/
 
 	m_startTrans = Math::Matrix::CreateTranslation(m_startPos.x, m_startPos.y, 0);
 	m_startScale = Math::Matrix::CreateScale(m_startSize.x, m_startSize.y, 0);
@@ -102,5 +121,9 @@ void C_TitleScene::StartInit()
 {
 	m_startPos = { 0,0 };
 	m_startSize = { 1.7f,1.7f };
+	m_alpha = 1.0f;
+	m_alphaMax = 1.0f;
+	m_alphaMin = 0.2f;
+	m_delet = 0.05f;
 	m_startTex.Load("Texture/Title/Start.png");
 }

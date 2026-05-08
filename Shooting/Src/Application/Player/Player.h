@@ -109,7 +109,11 @@ private:
 	//====================
 
 	int m_charaRadius;
-
+	float m_anime;
+	float m_animeSpeed;
+	float m_animeMax;
+	float m_animeMin;
+	float m_animeReset;
 	
 	float m_invincibleTime;
 	float m_invincibleMax;

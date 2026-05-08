@@ -9,13 +9,15 @@ void C_BossBullet::Draw()
 
 void C_BossBullet::Update()
 {
-	if (!m_aliveFlg) return;
-	m_pos += m_velocity;
-	
-	if (m_pos.y > 400.0f || m_pos.y < -400.0f ||
-		m_pos.x > 700.0f || m_pos.x < -700.0f)
+	if (m_aliveFlg) 
 	{
-		m_aliveFlg = false;
+		m_pos += m_velocity;
+
+		if (m_pos.y > 400.0f || m_pos.y < -400.0f ||
+			m_pos.x > 700.0f || m_pos.x < -700.0f)
+		{
+			m_aliveFlg = false;
+		}
 	}
 
 	m_trans = Math::Matrix::CreateTranslation(m_pos.x, m_pos.y, 0);

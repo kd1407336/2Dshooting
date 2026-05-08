@@ -4,7 +4,7 @@ void C_EnemyBullet::Draw()
 {
 	if (!m_aliveFlg)return;
 	SHADER.m_spriteShader.SetMatrix(m_mat);
-	SHADER.m_spriteShader.DrawTex(&m_tex, Math::Rectangle(0, 0, 16, 16), 1.0f);
+	SHADER.m_spriteShader.DrawTex(&m_tex, Math::Rectangle(0, 0, 7, 24), 1.0f);
 }
 
 void C_EnemyBullet::Update()
@@ -31,5 +31,5 @@ void C_EnemyBullet::Init()
 {
 	m_pos = { 0,0 };
 	m_size = { 1.0f,1.0f };
-	m_tex.Load("Texture/Bullet/Bullet.png");
+	m_tex.Load("Texture/Bullet/EnemyBullet.png");
 }

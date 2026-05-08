@@ -3,6 +3,7 @@
 #include "Application/Fade/FadeOut.h"
 #include "Application/Enemy/Enemy.h"
 #include "Application/Enemy/BossEnemy.h"
+#include "Application/Explosion/Explosion.h"
 #include "Application/EnemyBullet/EnemyBullet.h"
 #include "Application/EnemyBullet/BossBullet.h"
 #include "Application/HomeIcon/HomeIcon.h"
@@ -87,6 +88,12 @@ void C_GameScene::Draw()
 	if (m_level) { m_level->Level1Draw(); m_level->Level2Draw(); }
 	if (m_bEnemy) { m_bEnemy->Draw(); }
 
+	
+	for (auto& ex : m_explosions)
+	{
+		ex->Draw();
+	}
+
 	if (m_fadeIn) { m_fadeIn->Draw(); }
 	if (m_fadeOut) { m_fadeOut->Draw(); }
 }
@@ -128,7 +135,7 @@ void C_GameScene::Update()
 		if (e->IsDead()) {
 			// ここで新しいXを取得してリセットする！
 			float newX = GetSafeRandomX();
-			e->Reset(newX, 300.0f);
+			e->Reset(newX, 380.0f);
 		}
 	}
 
@@ -141,9 +148,16 @@ void C_GameScene::Update()
 		}
 	}
 
+	// Update内
+	for (auto& ex : m_explosions)
+	{
+		ex->Update();
+	}
+
 	if (m_timer) { m_timer->Update(); }
 	if (m_homeIcon) { m_homeIcon->Update(); }
 	if (m_level) { m_level->Level1Update(); m_level->Level2Update(); }
+	
 
 	// ボスの更新
 	if (m_bEnemy)
@@ -153,7 +167,7 @@ void C_GameScene::Update()
 		// ★重要：ここで弾の発射関数を呼ぶ！
 		if (m_bEnemy->GetAliveFlg())
 		{
-			m_bEnemy->Shoot3WayStep(m_bossBullets);
+			m_bEnemy->ShootCircleStep(m_bossBullets);
 		}
 
 	}
@@ -228,6 +242,12 @@ void C_GameScene::Init()
 	if (m_homeIcon) { m_homeIcon->Init(); }
 	if (m_level) { m_level->Level1Init(); m_level->Level2Init(); }
 	if (m_bEnemy) { m_bEnemy->Init(); }
+	
+	for (int i = 0; i < m_explosionMax; i++)
+	{
+		m_explosions.push_back(std::make_unique<C_Explosion>());
+		m_explosions.back()->Init();
+	}
 
 	for (int i = 0; i < m_scoreMax; i++)
 	{
@@ -281,6 +301,7 @@ void C_GameScene::Init()
 	m_bulletRadius = 16;
 	m_charaRadius = 32;
 	m_enemyRadius = 32;
+	m_bossRadius = 70;
 	m_iconRadius = 64;
 
 	m_maxEnemies = 10;
@@ -294,7 +315,7 @@ void C_GameScene::Init()
 
 void C_GameScene::Action()
 {
-	//敵とキャラの当たり判定
+	//敵とキャラの当たり判定===================================================
 	for (auto& e : m_enemies)
 	{
 		if (!e->GetAliveFlg()) continue;
@@ -324,16 +345,36 @@ void C_GameScene::Action()
 
 				m_totalScore += m_killPoint;
 
+				// --- 爆発をリストから探して再生 ---
+				for (auto& ex : m_explosions)
+				{
+					if (!ex->GetAliveFlg()) // 空いている爆発エフェクトを探す
+					{
+						ex->SetPos(e->GetPos());   // 敵の場所に配置
+						ex->SetAliveFlg(true);     // 再生開始！
+						// ※必要ならここでアニメーションフレーム(m_anime)を 0 にリセットする関数を呼ぶ
+						break;
+					}
+				}
+
 				// --- スコアを複数出す処理に書き換え ---
 				for (auto& s : m_score) // 配列の中から探す
 				{
 					if (!s.GetScoreFlg())
 					{
-						s.SetPos(e->GetPos());   // 敵の場所に配置
+						// 敵の座標を取得
+						Math::Vector2 enemyPos = e->GetPos();
+
+						// ★座標を少し上にずらす (Y座標にプラス、または環境によってはマイナス)
+						// 一般的な2Dゲームの座標系（上がプラス）なら +30.0f くらい
+						enemyPos.x += 30.0f;
+						enemyPos.y -= 20.0f;
+
+						s.SetPos(enemyPos);      // ずらした位置に配置
 						s.SetScore(m_killPoint);
 						s.SetScoreFlg(true);
 
-						break; 
+						break;
 					}
 				}
 				// --------------------------------------
@@ -342,49 +383,141 @@ void C_GameScene::Action()
 			}
 		}
 	}
+	//==============================================================================
 
-	//キャラの弾とボスの当たり判定
+	//敵の弾とキャラの当たり判定=======================================================
+	for (auto& eb : m_enemyBullets)
+	{
+		if (!eb->GetAliveFlg()) continue;
+
+		Math::Vector2 enemyBullet = m_player->GetPos() - eb->GetPos();
+
+		if(eb->GetAliveFlg())
+		{
+			if (enemyBullet.Length() <= m_charaRadius)
+			{
+				eb->SetAliveFlg(false);
+
+				if (!m_player->GetHitFlg())
+				{
+					m_player->Damage();
+					m_player->StartInvincible();
+				}
+			}
+		}
+	}
+	//===================================================================================
+
+	// 敵の弾とプレイヤーの弾の当たり判定
+	for (auto& eb : m_enemyBullets)
+	{
+		// そもそも敵の弾が生きていないなら判定スキップ
+		if (!eb->GetAliveFlg()) continue;
+
+		for (auto& pb : m_player->GetBullets())
+		{
+			// プレイヤーの弾が生きていないなら判定スキップ
+			if (!pb.active) continue;
+
+			// 弾と弾の間のベクトルを計算
+			Math::Vector2 diff = eb->GetPos() - pb.pos;
+
+			if (diff.Length() < 32.0f)
+			{
+
+				// --- 爆発をリストから探して再生 ---
+				for (auto& ex : m_explosions)
+				{
+					if (!ex->GetAliveFlg()) // 空いている爆発エフェクトを探す
+					{
+						ex->SetPos(eb->GetPos());   // 敵の場所に配置
+						ex->SetAliveFlg(true);     // 再生開始！
+						
+						break;
+					}
+				}
+
+				pb.active = false;      // プレイヤーの弾を消す
+				eb->SetAliveFlg(false); // 敵の弾を消す
+				break;                  // 敵の弾ebは消えたので、次の敵弾のループへ
+			}
+		}
+	}
+
+	// --- ボスの弾とプレイヤーの弾の当たり判定 ---
+	for (auto& bb : m_bossBullets) // bb = Boss Bullet
+	{
+		if (!bb->GetAliveFlg()) continue;
+
+		for (auto& pb : m_player->GetBullets())
+		{
+			if (!pb.active) continue;
+
+			Math::Vector2 diff = bb->GetPos() - pb.pos;
+
+			if (diff.Length() < 32.0f)
+			{
+				pb.active = false;      // プレイヤーの弾を消す
+				bb->SetAliveFlg(false); // ボスの弾を消す
+
+				// --- 爆発をリストから探して再生 ---
+				for (auto& ex : m_explosions)
+				{
+					if (!ex->GetAliveFlg()) // 空いている爆発エフェクトを探す
+					{
+						ex->SetPos(bb->GetPos());   // 敵の場所に配置
+						ex->SetAliveFlg(true);     // 再生開始！
+
+						break;
+					}
+				}
+				// ★ここに爆発エフェクトを出す処理を追加してもOK！
+
+				break;
+			}
+		}
+	}
+
+
+	//キャラの弾とボスの当たり判定==================================================
 	for (auto& b : m_player->GetBullets())
 	{
 		if (!b.active) continue;
 
 		Math::Vector2 bc = m_bEnemy->GetPos() - b.pos;
 
-		if (bc.Length() <= 90)
+		if (m_bEnemy->GetAliveFlg())
 		{
-			b.active = false;
-		}
-
-	}
-
-
-
-	//敵の弾とキャラの当たり判定
-	for (auto& eb : m_enemyBullets)
-	{
-		if (!eb->GetAliveFlg()) continue;
-
-		Math::Vector2 enemyBullet = eb->GetPos() - m_player->GetPos();
-
-		if (enemyBullet.Length() <= m_charaRadius)
-		{
-			eb->SetAliveFlg(false);
-
-			if (!m_player->GetHitFlg())
+			if (bc.Length() <= m_bossRadius)
 			{
-				m_player->Damage();
-				m_player->StartInvincible();
+				b.active = false;
+
+				// --- 爆発をリストから探して再生 ---
+				for (auto& ex : m_explosions)
+				{
+					if (!ex->GetAliveFlg()) // 空いている爆発エフェクトを探す
+					{
+						ex->SetPos(ex->GetPos());   // 敵の場所に配置
+						ex->SetAliveFlg(true);     // 再生開始！
+
+						break;
+					}
+				}
+
+
 			}
-			
 		}
+
 	}
+	//================================================================================
 
 
+	//ボスとキャラの当たり判定===========================================================
 	if (m_bEnemy->GetAliveFlg())
 	{
-		Math::Vector2 player = m_bEnemy->GetPos() - m_player->GetPos();
+		Math::Vector2 player = m_player->GetPos() - m_bEnemy->GetPos();
 
-		if (player.Length() + 32)
+		if (player.Length() <= m_charaRadius + m_bossRadius)
 		{
 			if (!m_player->GetHitFlg())
 			{
@@ -414,7 +547,7 @@ void C_GameScene::Action()
 		}
 
 	}
-
+	//==========================================================================================
 
 }
 

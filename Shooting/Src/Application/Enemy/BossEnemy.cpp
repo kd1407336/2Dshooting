@@ -14,6 +14,16 @@ void C_BossEnemy::Draw()
 void C_BossEnemy::Update()
 {
 
+    if (m_aliveFlg)
+    {
+        m_pos.y -= 3.0f;
+
+        if (m_pos.y <= 280)
+        {
+            m_pos.y = 280;
+        }
+    }
+
 	m_trans = Math::Matrix::CreateTranslation(m_pos.x, m_pos.y, 0);
 	m_scale = Math::Matrix::CreateScale(m_size.x, m_size.y, 0);
 	m_mat = m_scale * m_trans;
@@ -21,10 +31,10 @@ void C_BossEnemy::Update()
 
 void C_BossEnemy::Init()
 {
-	m_pos = { 0,0 };
+	m_pos = { 0,460 };
 	m_size = { 3.0f,3.0f };
     m_shotTimer = 60; // ← これを追加（出現してから1秒後に発射開始）
-	m_tex.Load("Texture/Enemy/Player.png");
+	m_tex.Load("Texture/Enemy/Enemy.png");
 	m_aliveFlg = false;
 	m_hitFlg = false;
 }
@@ -61,7 +71,7 @@ void C_BossEnemy::ShootCircleStep(std::vector<std::unique_ptr<C_BossBullet>>& li
 
             m_shotTimer = 10; // 次の弾までの間隔（ここを調整）
 
-            return; // ★重要：1発撃ったらこの関数の処理を完全に抜ける！
+            return; 
         }
     }
 }
@@ -99,7 +109,7 @@ void C_BossEnemy::Shoot3WayStep(std::vector<std::unique_ptr<C_BossBullet>>& list
             }
             // ------------------------
 
-            return; // 1発撃ったので終了
+            //return; // 1発撃ったので終了
         }
     }
 }

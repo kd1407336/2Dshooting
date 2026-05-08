@@ -14,6 +14,8 @@ public:
 	void SetTimerFlg(bool timerFlg) { m_timerFlg = timerFlg; }
 	bool GetTimerFlg() { return m_timerFlg; }
 
+	void SetClearFrame(int frame) { m_clearFrame = frame; }
+
 private:
 
 	Math::Vector2 m_pos;
@@ -23,10 +25,13 @@ private:
 	Math::Matrix m_scale;
 	KdTexture m_tex;
 
+	int m_clearFrame;
+
 	unsigned long m_timer;
 	int m_timerLimit;
 	int m_timerCnt;
 	int m_timerReset;
 	bool m_timerFlg;
+	int m_totalFrame = 0;
 
 };

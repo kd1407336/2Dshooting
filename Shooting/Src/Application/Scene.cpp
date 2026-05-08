@@ -15,7 +15,7 @@ void Scene::Update()
 
 void Scene::Init()
 {
-	SCENEMANAGER.ChangeState(new C_TitleScene());
+	SCENEMANAGER.ChangeState(new C_GameScene());
 
 }
 

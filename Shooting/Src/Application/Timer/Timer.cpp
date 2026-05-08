@@ -33,7 +33,11 @@ void C_Timer::Draw()
 
 void C_Timer::Update()
 {
-	if (m_timerFlg) { m_timer++; }
+	if (m_timerFlg)
+	{
+		m_timer++; 
+		m_totalFrame++;
+	}
 	
 	if (m_timer >= m_timerLimit)
 	{

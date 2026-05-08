@@ -39,7 +39,7 @@ void C_Player::Draw()
 {
 	if (!m_aliveFlg)return;
 	SHADER.m_spriteShader.SetMatrix(m_mat);
-	SHADER.m_spriteShader.DrawTex(&m_tex, Math::Rectangle(0, 0, 64, 64),m_alpha);
+	SHADER.m_spriteShader.DrawTex(&m_tex, Math::Rectangle((int)m_anime * 64, 0, 64, 64), m_alpha);
 
 	HpDraw();
 	BulletDraw();
@@ -64,6 +64,14 @@ void C_Player::Init()
 	HpInit();
 	BulletInit();
 
+	//ƒAƒjƒ[ƒVƒ‡ƒ“ŠÖŒW=====
+	m_anime = 0.0f;
+	m_animeSpeed = 0.12f;
+	m_animeMax = 2.5;
+	m_animeMin = 0.0f;
+	m_animeReset = 0.0f;
+	//========================
+
 	m_invincibleTime = 0.0f;
 	m_invincibleMax = 1.5f; // –³“GŽžŠÔi1•b‚È‚Çj
 }
@@ -74,11 +82,44 @@ void C_Player::Action()
 	if (GetAsyncKeyState(VK_LEFT) & 0x8000)
 	{
 		m_pos.x -= m_dirX;
-	}
 
-	if (GetAsyncKeyState(VK_RIGHT) & 0x8000)
+		//‰æ‘œ‚ð”½“]‚³‚¹‚é
+		m_size.x = -1.0f;
+
+		m_anime += m_animeSpeed;
+
+		if (m_anime >= m_animeMax)
+		{
+			m_anime = m_animeMax;
+		}
+
+	}
+	else if (GetAsyncKeyState(VK_RIGHT) & 0x8000)
 	{
 		m_pos.x += m_dirX;
+		
+		m_size.x = 1.0f;
+
+		m_anime += m_animeSpeed;
+
+		if (m_anime >= m_animeMax)
+		{
+			m_anime = m_animeMax;
+		}
+
+	}
+	else
+	{
+		if (m_anime >= m_animeMin)
+		{
+			m_anime -= m_animeSpeed;
+		}
+
+		if (m_anime <= m_animeMin)
+		{
+			m_anime = m_animeMin;
+		}
+
 	}
 
 	if (GetAsyncKeyState(VK_UP) & 0x8000)
