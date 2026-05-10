@@ -91,6 +91,21 @@
     <Filter Include="Src\Application\Explosion">
       <UniqueIdentifier>{af440c36-8884-48e2-baf0-2fd73f836f43}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Src\Application\Window">
+      <UniqueIdentifier>{5949c1c8-a163-450d-834e-c283070d1149}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src\Application\GameScreen">
+      <UniqueIdentifier>{12da3932-1671-4ca6-9d8e-961068314d57}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src\Application\ClockIcon">
+      <UniqueIdentifier>{65c1fe54-4827-489e-bb73-07ed773e01b4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src\Application\GameClear">
+      <UniqueIdentifier>{07f46104-89b1-411b-8aec-cf1670bc120f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src\Application\GameOver">
+      <UniqueIdentifier>{041db581-0ec1-4cf8-b8a9-297338247dac}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Pch.h">
@@ -246,6 +261,21 @@
     <ClInclude Include="Src\Application\Explosion\Explosion.h">
       <Filter>Src\Application\Explosion</Filter>
     </ClInclude>
+    <ClInclude Include="Src\Application\Window\Window.h">
+      <Filter>Src\Application\Window</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Application\GameScreen\GameScreen.h">
+      <Filter>Src\Application\GameScreen</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Application\ClockIcon\ClockIcon.h">
+      <Filter>Src\Application\ClockIcon</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Application\GameClear\GameClear.h">
+      <Filter>Src\Application\GameClear</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Application\GameOver\GameOver.h">
+      <Filter>Src\Application\GameOver</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Pch.cpp">
@@ -367,6 +397,21 @@
     </ClCompile>
     <ClCompile Include="Src\Application\Explosion\Explosion.cpp">
       <Filter>Src\Application\Explosion</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Application\Window\Window.cpp">
+      <Filter>Src\Application\Window</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Application\GameScreen\GameScreen.cpp">
+      <Filter>Src\Application\GameScreen</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Application\ClockIcon\ClockIcon.cpp">
+      <Filter>Src\Application\ClockIcon</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Application\GameClear\GameClear.cpp">
+      <Filter>Src\Application\GameClear</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Application\GameOver\GameOver.cpp">
+      <Filter>Src\Application\GameOver</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -3,6 +3,13 @@
 
 class C_BossBullet;
 
+enum class BossState 
+{
+	Appear, // 画面外から登場中
+	Move    // 画面内で行動中
+};
+
+
 class C_BossEnemy	:	public C_EnemyBase
 {
 public:
@@ -13,6 +20,11 @@ public:
 	void Draw();
 	void Update();
 	void Init();
+
+	void HpDraw();
+	void HpUpdate();
+	void HpInit();
+
 
 	void SetAliveFlg(bool aliveFlg) { m_aliveFlg = aliveFlg; }
 	bool GetAliveFlg() { return m_aliveFlg; }
@@ -28,9 +40,46 @@ public:
 	void Shoot3WayStep(std::vector<std::unique_ptr<C_BossBullet>>& list);
 	void ShootCircle(std::vector<std::unique_ptr<C_BossBullet>>& list);
 
+	void SetHp(float hp) { m_hp = hp; }
+	float GetHp() { return m_hp; }
+	float GetHpMax() { return m_hpMax; }
+
+	void Damage();
+
 private:
+
+	//HP用
+	Math::Vector2 m_hpPos;
+	Math::Vector2 m_hpSize;
+	Math::Matrix m_hpMat;
+	Math::Matrix m_hpTrans;
+	Math::Matrix m_hpScale;
+	KdTexture m_hpTex;
+
+	Math::Vector2 m_hpBerPos;
+	Math::Vector2 m_hpBerSize;
+	Math::Matrix m_hpBerMat;
+	Math::Matrix m_hpBerTrans;
+	Math::Matrix m_hpBerScale;
+	Math::Matrix m_hpDrawMat;
+
+
+	Math::Vector2 m_mojiPos;
+	Math::Vector2 m_mojiSize;
+	Math::Matrix m_mojiMat;
+	Math::Matrix m_mojiTrans;
+	Math::Matrix m_mojiScale;
+	KdTexture m_mojiTex;
+
+	float m_hp;
+	float m_hpMax;
+	float m_hpDraw;
 
 	float m_currentShotAngle = 0.0f; // 現在の角度を保存する変数
 	int m_wayCount = 0;    // 今、何発目を撃つか
+
+
+	BossState m_state = BossState::Appear;
+	float m_moveTimer = 0.0f; // 移動演出用のタイマー
 
 };

@@ -116,7 +116,7 @@ void C_Score::UiUpdate()
 void C_Score::UiInit()
 {
     // 合計スコアUIの初期設定
-    m_uiPos = { 460.0f, 150.0f };
+    m_uiPos = { 340.0f, 150.0f };
     m_uiSize = { 1.0f,1.0f };
     m_uiAlpha = 1.0f;
 }
@@ -125,7 +125,7 @@ void C_Score::ScoreDraw()
 {
     SHADER.m_spriteShader.SetMatrix(m_scoreMat);
     // 描画
-    SHADER.m_spriteShader.DrawTex(&m_scoreTex,Math::Rectangle(0,0,69,50),1.0f);
+    SHADER.m_spriteShader.DrawTex(&m_scoreTex, Math::Rectangle(0, 0, 140, 50), 1.0f);
 }
 
 void C_Score::ScoreUpdate()
@@ -137,7 +137,7 @@ void C_Score::ScoreUpdate()
 
 void C_Score::ScoreInit()
 {
-    m_scorePos = { 500,180 };
-    m_scoreSize = { 1.7f,1.7f };
+    m_scorePos = { 388,185 };
+    m_scoreSize = { 0.9f,0.9f };
     m_scoreTex.Load("Texture/Score/Score.png");
 }

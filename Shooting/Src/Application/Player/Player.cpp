@@ -8,7 +8,7 @@ C_Player::C_Player()
 	m_dirX = 7;
 	m_dirY = 3;
 	
-	m_screenRight = 640;
+	m_screenRight = 310;
 	m_screenLeft = -640;
 	m_screenTop = 360;
 	m_screenDown = -360;
@@ -37,10 +37,23 @@ C_Player::~C_Player()
 
 void C_Player::Draw()
 {
-	if (!m_aliveFlg)return;
-	SHADER.m_spriteShader.SetMatrix(m_mat);
-	SHADER.m_spriteShader.DrawTex(&m_tex, Math::Rectangle((int)m_anime * 64, 0, 64, 64), m_alpha);
+	// 1. 表示するコマの番号（0, 1, 2）を決める
+	int frameIndex = (int)fabsf(m_anime);
 
+	// 2. 左に傾いている時（m_anime < 0）だけ画像を反転させる行列を作る
+	Math::Matrix renderMat = m_mat;
+	if (m_anime < 0) 
+	{
+		// X軸を-1倍して反転（中心点などの設定に合わせて調整が必要な場合があります）
+		renderMat = Math::Matrix::CreateScale(-1.0f, 1.0f, 1.0f) * m_mat;
+	}
+
+	// 3. 描画実行
+	SHADER.m_spriteShader.SetMatrix(renderMat);
+	// frameIndex を使って 64, 128 とずらす
+	SHADER.m_spriteShader.DrawTex(&m_tex, Math::Rectangle(frameIndex * 64, 0, 64, 64), m_alpha);
+
+	MojiDraw();
 	HpDraw();
 	BulletDraw();
 
@@ -48,8 +61,9 @@ void C_Player::Draw()
 
 void C_Player::Update()
 {
-	
+
 	Action();
+	MojiUpdate();
 	HpUpdate();
 	BulletUpdate();
 
@@ -62,11 +76,12 @@ void C_Player::Init()
 {
 	m_tex.Load("Texture/Player/Player.png");
 	HpInit();
+	MojiInit();
 	BulletInit();
 
 	//アニメーション関係=====
 	m_anime = 0.0f;
-	m_animeSpeed = 0.12f;
+	m_animeSpeed = 0.15f;
 	m_animeMax = 2.5;
 	m_animeMin = 0.0f;
 	m_animeReset = 0.0f;
@@ -78,48 +93,25 @@ void C_Player::Init()
 
 void C_Player::Action()
 {
-	//プレイヤー移動処理
-	if (GetAsyncKeyState(VK_LEFT) & 0x8000)
+	// 左右の入力
+	if (GetAsyncKeyState(VK_LEFT) & 0x8000) 
 	{
 		m_pos.x -= m_dirX;
-
-		//画像を反転させる
-		m_size.x = -1.0f;
-
-		m_anime += m_animeSpeed;
-
-		if (m_anime >= m_animeMax)
-		{
-			m_anime = m_animeMax;
-		}
-
+		m_anime -= m_animeSpeed;
+		if (m_anime < -m_animeMax) m_anime = -m_animeMax;
 	}
-	else if (GetAsyncKeyState(VK_RIGHT) & 0x8000)
+	else if (GetAsyncKeyState(VK_RIGHT) & 0x8000) 
 	{
 		m_pos.x += m_dirX;
-		
-		m_size.x = 1.0f;
-
 		m_anime += m_animeSpeed;
-
-		if (m_anime >= m_animeMax)
-		{
-			m_anime = m_animeMax;
-		}
-
+		if (m_anime > m_animeMax) m_anime = m_animeMax;
 	}
-	else
+	else 
 	{
-		if (m_anime >= m_animeMin)
-		{
-			m_anime -= m_animeSpeed;
-		}
-
-		if (m_anime <= m_animeMin)
-		{
-			m_anime = m_animeMin;
-		}
-
+		// どちらも押していない時は 0 に戻す
+		if (m_anime > m_animeSpeed)       m_anime -= m_animeSpeed;
+		else if (m_anime < -m_animeSpeed)  m_anime += m_animeSpeed;
+		else                               m_anime = 0.0f;
 	}
 
 	if (GetAsyncKeyState(VK_UP) & 0x8000)
@@ -143,10 +135,7 @@ void C_Player::Action()
 		m_pos.x = m_screenLeft + m_charaRadius;
 	}
 
-	if (GetAsyncKeyState('K') & 0x8000)
-	{
-		m_aliveFlg = false;
-	}
+	
 
 
 
@@ -185,10 +174,22 @@ void C_Player::Action()
 
 void C_Player::HpDraw()
 {
-	SHADER.m_spriteShader.SetMatrix(m_hpMat);
-	Math::Rectangle rect = { 0,0,271,21 };
-	Math::Color hpColor = { 0.0f,1.0f,0.0f,1.0f };
-	SHADER.m_spriteShader.DrawTex(&m_hpTex, 0, 0, &rect, &hpColor);
+	//HP（黒）
+	SHADER.m_spriteShader.SetMatrix(m_hpBerMat);
+	Math::Rectangle hpBerRect = { 0,0,271,21 };
+	Math::Color hpBerColor = { 0.0f,0.0f,0.0f,1.0f };
+	SHADER.m_spriteShader.DrawTex(&m_hpTex, 0, 0, &hpBerRect, &hpBerColor);
+
+	// --- 1. 背景または削れている部分（赤）を先に描く ---
+	SHADER.m_spriteShader.SetMatrix(m_hpDrawMat); // m_hpDraw(遅れて減る方)を使用
+	Math::Rectangle rect = { 0, 0, 271, 21 };
+	Math::Color redColor = { 1.0f, 0.0f, 0.0f, 1.0f }; // 赤色
+	SHADER.m_spriteShader.DrawTex(&m_hpTex, 0, 0, &rect, &redColor);
+	
+	// --- 2. 現在のHP（緑）を上に重ねて描く ---
+	SHADER.m_spriteShader.SetMatrix(m_hpMat); // m_hp(すぐ減る方)を使用
+	Math::Color greenColor = { 0.0f, 1.0f, 0.0f, 1.0f }; // 緑色
+	SHADER.m_spriteShader.DrawTex(&m_hpTex, 0, 0, &rect, &greenColor);
 }
 
 void C_Player::HpUpdate()
@@ -196,7 +197,7 @@ void C_Player::HpUpdate()
 	//HPが徐々に減るようにする
 	if (m_hpDraw > m_hp)
 	{
-		m_hpDraw -= 0.3f;
+		m_hpDraw -= 0.05f;
 
 		if (m_hpDraw < m_hp)
 		{
@@ -212,15 +213,46 @@ void C_Player::HpUpdate()
 
 	m_hpSize.x = HpRate;
 
-	m_hpTrans = Math::Matrix::CreateTranslation(m_hpPos.x, m_hpPos.y, 0);
-	m_hpScale = Math::Matrix::CreateScale(m_hpSize.x, m_hpSize.y, 0);
-	m_hpMat = m_hpScale * m_hpTrans;
+	// 共通の定数（画像幅 271 の半分）
+	const float halfWidth = 135.5f;
+
+	// 1. 赤いバー（追いかける方：m_hpDraw）の行列計算
+	float redRate = m_hpDraw / m_hpMax;
+	if (redRate < 0.0f) redRate = 0.0f;
+
+	Math::Matrix redScaleMat = Math::Matrix::CreateScale(redRate, m_hpSize.y, 1.0f);
+	// 縮んだ割合の半分だけ左にオフセット
+	float redOffsetX = halfWidth * (1.0f - redRate);
+	Math::Matrix redTransMat = Math::Matrix::CreateTranslation(m_hpPos.x - redOffsetX, m_hpPos.y, 0);
+
+	m_hpDrawMat = redScaleMat * redTransMat;
+
+
+	// 2. 緑のバー（現在のHP：m_hp）の行列計算
+	float greenRate = m_hp / m_hpMax;
+	if (greenRate < 0.0f) greenRate = 0.0f;
+
+	Math::Matrix greenScaleMat = Math::Matrix::CreateScale(greenRate, m_hpSize.y, 1.0f);
+	// 縮んだ割合の半分だけ左にオフセット
+	float greenOffsetX = halfWidth * (1.0f - greenRate);
+	Math::Matrix greenTransMat = Math::Matrix::CreateTranslation(m_hpPos.x - greenOffsetX, m_hpPos.y, 0);
+
+	m_hpMat = greenScaleMat * greenTransMat;
+
+	m_hpBerTrans = Math::Matrix::CreateTranslation(m_hpBerPos.x, m_hpBerPos.y, 0);
+	m_hpBerScale = Math::Matrix::CreateScale(m_hpBerSize.x, m_hpBerSize.y, 0);
+	m_hpBerMat = m_hpBerScale * m_hpBerTrans;
 }
 
 void C_Player::HpInit()
 {
-	m_hpPos = { -200,250 };
+	m_hpPos = { 470,-30 };
 	m_hpSize = { 1.0f,1.0f };
+
+
+	m_hpBerPos = { 470,-30 };
+	m_hpBerSize = { 1.0f,1.0f };
+
 	m_hpTex.Load("Texture/HpBer/HpBer.png");
 }
 
@@ -251,14 +283,23 @@ void C_Player::BulletUpdate()
 	{
 		if (m_shotInterval == 0)
 		{
-			Bullet b;
-			b.pos = m_pos;
-			b.pos.y += 10;
-			b.active = true;
+			// --- 1発目 (左側に5ピクセルずらす) ---
+			Bullet bLeft;
+			bLeft.pos = m_pos;
+			bLeft.pos.x -= 15; // ★ここを調整
+			bLeft.pos.y += 10;
+			bLeft.active = true;
+			m_bullets.push_back(bLeft);
 
-			m_bullets.push_back(b);
+			// --- 2発目 (右側に5ピクセルずらす) ---
+			Bullet bRight;
+			bRight.pos = m_pos;
+			bRight.pos.x += 15; // ★ここを調整
+			bRight.pos.y += 10;
+			bRight.active = true;
+			m_bullets.push_back(bRight);
 
-			m_shotInterval = m_shotIntervalMax; // ★ クールタイムをリセット
+			m_shotInterval = m_shotIntervalMax;
 		}
 		
 	}
@@ -297,6 +338,26 @@ void C_Player::BulletInit()
 	m_shotIntervalMax = 10;
 	m_bulletTex.Load("Texture/Bullet/Bullet.png");
 	m_bulletFlg = false;
+}
+
+void C_Player::MojiDraw()
+{
+	SHADER.m_spriteShader.SetMatrix(m_mojiMat);
+	SHADER.m_spriteShader.DrawTex(&m_mojiTex, Math::Rectangle(0, 0, 68, 51), 1.0f);
+}
+
+void C_Player::MojiUpdate()
+{
+	m_mojiTrans = Math::Matrix::CreateTranslation(m_mojiPos.x, m_mojiPos.y, 0);
+	m_mojiScale = Math::Matrix::CreateScale(m_mojiSize.x, m_mojiSize.y, 0);
+	m_mojiMat = m_mojiScale * m_mojiTrans;
+}
+
+void C_Player::MojiInit()
+{
+	m_mojiPos = { 355,0 };
+	m_mojiSize = { 1.0f,1.0f };
+	m_mojiTex.Load("Texture/HpBer/Hp.png");
 }
 
 void C_Player::Damage()

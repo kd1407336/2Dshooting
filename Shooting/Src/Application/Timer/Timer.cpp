@@ -29,20 +29,24 @@ void C_Timer::Draw()
 		SHADER.m_spriteShader.DrawTex(&m_tex, 0, 0, &rect, &color);
 	}
 
+	MojiDraw();
+
 }
 
 void C_Timer::Update()
 {
+	MojiUpdate();
+
 	if (m_timerFlg)
 	{
-		m_timer++; 
+		m_timer++;
 		m_totalFrame++;
-	}
-	
-	if (m_timer >= m_timerLimit)
-	{
-		m_timerCnt += 1;
-		m_timer = m_timerReset;
+
+		if (m_timer >= m_timerLimit)
+		{
+			m_timerCnt += 1;
+			m_timer = m_timerReset;
+		}
 	}
 
 
@@ -54,7 +58,7 @@ void C_Timer::Update()
 
 void C_Timer::Init()
 {
-	m_pos = { 0,320 };
+	m_pos = { 440,-90 };
 	m_size = { 1.0f,1.0f };
 	m_timer = 0;
 	m_timerCnt = 0;
@@ -62,4 +66,27 @@ void C_Timer::Init()
 	m_timerReset = 0;
 	m_timerFlg = false;
 	m_tex.Load("Texture/Timer/Suuji.png");
+
+	MojiInit();
+}
+
+void C_Timer::MojiDraw()
+{
+	SHADER.m_spriteShader.SetMatrix(m_mojiMat);
+	SHADER.m_spriteShader.DrawTex(&m_mojiTex, Math::Rectangle(0, 0, 102, 41), 1.0f);
+}
+
+void C_Timer::MojiUpdate()
+{
+	m_mojiTrans = Math::Matrix::CreateTranslation(m_mojiPos.x, m_mojiPos.y, 0);
+	m_mojiScale = Math::Matrix::CreateScale(m_mojiSize.x, m_mojiSize.y, 0);
+	m_mojiMat = m_mojiScale * m_mojiTrans;
+}
+
+void C_Timer::MojiInit()
+{
+	m_mojiPos = { 375,-90
+ 	};
+	m_mojiSize = { 1.0f,1.0f };
+	m_mojiTex.Load("Texture/Timer/Time.png");
 }

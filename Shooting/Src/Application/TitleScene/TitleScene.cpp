@@ -7,19 +7,11 @@
 
 extern MouseManager g_mouse;
 
-C_TitleScene::C_TitleScene()
-{
-	
-}
-
-C_TitleScene::~C_TitleScene()
-{
-	if (m_fadeIn) { delete m_fadeIn; }
-	if (m_fadeOut) { delete m_fadeOut; }
-}
 
 void C_TitleScene::Draw()
 {
+	ScreenDraw();
+
 	StartDraw();
 
 	if (m_fadeOut ) { m_fadeOut->Draw(); }
@@ -33,7 +25,7 @@ void C_TitleScene::Update()
 
 	g_mouse.Update();
 	StartUpdate();
-	
+	ScreenUpdate();
 
 	if (SCENEMANAGER.GetRequestFadeIn())
 	{
@@ -55,6 +47,7 @@ void C_TitleScene::Update()
 void C_TitleScene::Init()
 {
 	StartInit();
+	ScreenInit();
 	
 	m_fadeOut = new C_FadeOut();
 	if (m_fadeOut) { m_fadeOut->Init(); }
@@ -126,4 +119,30 @@ void C_TitleScene::StartInit()
 	m_alphaMin = 0.2f;
 	m_delet = 0.05f;
 	m_startTex.Load("Texture/Title/Start.png");
+}
+
+void C_TitleScene::ScreenDraw()
+{
+	SHADER.m_spriteShader.SetMatrix(m_screenMat);
+	SHADER.m_spriteShader.DrawTex(&m_screenTex, Math::Rectangle(0, 0, 320, 320), 1.0f);
+}
+
+void C_TitleScene::ScreenUpdate()
+{
+	m_screenTrans = Math::Matrix::CreateTranslation(m_screenPos.x, m_screenPos.y, 0);
+	m_screenScale = Math::Matrix::CreateScale(m_screenSize.x, m_screenSize.y, 0);
+	m_screenMat = m_screenScale * m_screenTrans;
+}
+
+void C_TitleScene::ScreenInit()
+{
+	m_screenPos = { 0,0 };
+	m_screenSize = { 4.0f,4.0f };
+	m_screenTex.Load("Texture/Title/Screen.png");
+}
+
+void C_TitleScene::Release()
+{
+	if (m_fadeIn) { delete m_fadeIn; m_fadeIn = nullptr; }
+	if (m_fadeOut) { delete m_fadeOut; m_fadeOut = nullptr; }
 }

@@ -159,6 +159,7 @@
     <ClInclude Include="..\Library\tinygltf\stb_image.h" />
     <ClInclude Include="..\Library\tinygltf\stb_image_write.h" />
     <ClInclude Include="..\Library\tinygltf\tiny_gltf.h" />
+    <ClInclude Include="Src\Application\ClockIcon\ClockIcon.h" />
     <ClInclude Include="Src\Application\EnemyBullet\BossBullet.h" />
     <ClInclude Include="Src\Application\EnemyBullet\EnemyBullet.h" />
     <ClInclude Include="Src\Application\Enemy\BossEnemy.h" />
@@ -168,7 +169,10 @@
     <ClInclude Include="Src\Application\Fade\Fade.h" />
     <ClInclude Include="Src\Application\Fade\FadeIn.h" />
     <ClInclude Include="Src\Application\Fade\FadeOut.h" />
+    <ClInclude Include="Src\Application\GameClear\GameClear.h" />
+    <ClInclude Include="Src\Application\GameOver\GameOver.h" />
     <ClInclude Include="Src\Application\GameScene\GameScene.h" />
+    <ClInclude Include="Src\Application\GameScreen\GameScreen.h" />
     <ClInclude Include="Src\Application\HomeIcon\HomeIcon.h" />
     <ClInclude Include="Src\Application\Level\Level.h" />
     <ClInclude Include="Src\Application\MouseManager\MouseManager.h" />
@@ -181,6 +185,7 @@
     <ClInclude Include="Src\Application\State\State.h" />
     <ClInclude Include="Src\Application\Timer\Timer.h" />
     <ClInclude Include="Src\Application\TitleScene\TitleScene.h" />
+    <ClInclude Include="Src\Application\Window\Window.h" />
     <ClInclude Include="Src\System\Audio\KdAudio.h" />
     <ClInclude Include="src\System\Direct3D\KdDirect3D.h" />
     <ClInclude Include="Src\System\Direct3D\KdDirect3DHelper.h" />
@@ -204,6 +209,7 @@
     <ClCompile Include="..\Library\imgui\imgui_impl_dx11.cpp" />
     <ClCompile Include="..\Library\imgui\imgui_impl_win32.cpp" />
     <ClCompile Include="..\Library\imgui\imgui_widgets.cpp" />
+    <ClCompile Include="Src\Application\ClockIcon\ClockIcon.cpp" />
     <ClCompile Include="Src\Application\EnemyBullet\BossBullet.cpp" />
     <ClCompile Include="Src\Application\EnemyBullet\EnemyBullet.cpp" />
     <ClCompile Include="Src\Application\Enemy\BossEnemy.cpp" />
@@ -213,7 +219,10 @@
     <ClCompile Include="Src\Application\Fade\Fade.cpp" />
     <ClCompile Include="Src\Application\Fade\FadeIn.cpp" />
     <ClCompile Include="Src\Application\Fade\FadeOut.cpp" />
+    <ClCompile Include="Src\Application\GameClear\GameClear.cpp" />
+    <ClCompile Include="Src\Application\GameOver\GameOver.cpp" />
     <ClCompile Include="Src\Application\GameScene\GameScene.cpp" />
+    <ClCompile Include="Src\Application\GameScreen\GameScreen.cpp" />
     <ClCompile Include="Src\Application\HomeIcon\HomeIcon.cpp" />
     <ClCompile Include="Src\Application\Level\Level.cpp" />
     <ClCompile Include="Src\Application\MouseManager\MouseManager.cpp" />
@@ -225,6 +234,7 @@
     <ClCompile Include="Src\Application\State\State.cpp" />
     <ClCompile Include="Src\Application\Timer\Timer.cpp" />
     <ClCompile Include="Src\Application\TitleScene\TitleScene.cpp" />
+    <ClCompile Include="Src\Application\Window\Window.cpp" />
     <ClCompile Include="Src\System\Audio\KdAudio.cpp" />
     <ClCompile Include="src\System\Direct3D\KdDirect3D.cpp" />
     <ClCompile Include="Src\System\Direct3D\KdDirect3DHelper.cpp" />

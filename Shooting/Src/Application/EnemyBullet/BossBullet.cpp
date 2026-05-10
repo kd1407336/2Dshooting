@@ -13,8 +13,8 @@ void C_BossBullet::Update()
 	{
 		m_pos += m_velocity;
 
-		if (m_pos.y > 400.0f || m_pos.y < -400.0f ||
-			m_pos.x > 700.0f || m_pos.x < -700.0f)
+		if (m_pos.y > 300.0f || m_pos.y < -640.0f ||
+			m_pos.x > 360.0f || m_pos.x < -360.0f)
 		{
 			m_aliveFlg = false;
 		}
@@ -27,7 +27,7 @@ void C_BossBullet::Update()
 
 void C_BossBullet::Init()
 {
-	m_pos = { 0,0 };
+	m_pos = { -50,0 };
 	m_size = { 1.5f,1.5f };
 	m_tex.Load("Texture/Bullet/Bullet.png");
 

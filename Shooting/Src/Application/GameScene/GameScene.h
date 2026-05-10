@@ -3,7 +3,12 @@
 #include "Application/Player/Player.h"
 #include "Application/Fade/FadeIn.h"
 #include "Application/Enemy/EnemyBase.h"
+#include "Application/Result/Result.h"
 #include "Application/Score/Score.h"
+#include "Application/Explosion/Explosion.h"
+#include "Application/Enemy/Enemy.h"
+#include "Application/EnemyBullet/EnemyBullet.h"
+#include "Application/EnemyBullet/BossBullet.h"
 #include <memory>
 
 class C_Enemy;
@@ -13,18 +18,23 @@ class C_EnemyBullet;
 class C_EnemyBullet;
 class C_Explosion;
 class C_FadeOut;
+class C_GameClear;
+class C_GameOver;
+class C_GameScreen;
 class C_HomeIcon;
 class C_Level;
 class C_TitleScene;
 class C_Timer;
+class C_Window;
 
 class C_GameScene : public C_State
 {
 public:
-	C_GameScene();
-	~C_GameScene()override;
+	C_GameScene() {}
+	~C_GameScene()override { Release(); }
 
 	void Draw() override;
+ 
 	void Update() override;
 	void Init() override;
 
@@ -43,10 +53,15 @@ private:
 	C_Player*		m_player = nullptr;
 	C_FadeIn*		m_fadeIn = nullptr;
 	C_FadeOut*		m_fadeOut = nullptr;
+	C_GameScreen*	m_gameScreen = nullptr;
+	C_GameClear*	m_gameClear = nullptr;
+	C_GameOver*		m_gameOver = nullptr;
 	C_Timer*		m_timer = nullptr;
 	C_HomeIcon*		m_homeIcon= nullptr;
 	C_Level*		m_level = nullptr;
 	C_BossEnemy*	m_bEnemy = nullptr;
+	C_Window*		m_window = nullptr;
+	
 
 	// 爆発の最大数（画面内に同時に出せる数）
 	static const int m_explosionMax = 10;
@@ -65,6 +80,11 @@ private:
 	bool m_resultFadeFlg;
 	bool m_titleFadeFlg;
 
+	bool m_isGameOver;
+	bool m_isGameClear;
+	int m_gameOverTimer;
+	int m_gameClearTimer;
+
 	int m_radius;
 	int m_charaRadius; 
 	int m_bulletRadius;
@@ -77,8 +97,14 @@ private:
 	int m_killPoint;
 	int m_totalScore;
 	int m_displayScore;
+	int m_playerHitCount = 0;
+	int m_totalHitCount = 0;
+
+	int m_lastClearFrame = 0; // クリアタイム保持用
+	int m_lastClearScore = 0;
 
 	std::mt19937 m_mt{ std::random_device{}() }; // クラス作成時に一度だけ初期化
-	std::uniform_int_distribution<int> m_distX{ -610, 400 };
+	std::uniform_int_distribution<int> m_distX{ -610, 250 };
 
+	void Release();
 };

@@ -28,6 +28,10 @@ public:
 	void BulletUpdate();
 	void BulletInit();
 
+	void MojiDraw();
+	void MojiUpdate();
+	void MojiInit();
+
 	//ê∂ë∂ÉtÉâÉO
 	void SetAliveFlg(bool flg) { m_aliveFlg = flg; }
 	bool GetAliveFlg() { return m_aliveFlg; }
@@ -41,6 +45,9 @@ public:
 	bool GetHitFlg() { return m_hitFlg; }
 
 	void Damage();
+
+	void SetHp(int hp) { m_hp = hp; }
+	int GetHp() { return m_hp; }
 
 	Math::Vector2 GetBulletPos() { return m_bulletPos; }
 
@@ -66,6 +73,13 @@ private:
 	Math::Matrix m_hpScale;
 	KdTexture m_hpTex;
 
+	Math::Vector2 m_hpBerPos;
+	Math::Vector2 m_hpBerSize;
+	Math::Matrix m_hpBerMat;
+	Math::Matrix m_hpBerTrans;
+	Math::Matrix m_hpBerScale;
+	Math::Matrix m_hpDrawMat;
+
 	//íeóp
 	Math::Vector2 m_bulletPos;
 	Math::Vector2 m_bulletSize;
@@ -76,6 +90,13 @@ private:
 	bool m_bulletFlg = false;
 	int m_shotInterval;
 	int m_shotIntervalMax;
+
+	Math::Vector2 m_mojiPos;
+	Math::Vector2 m_mojiSize;
+	Math::Matrix m_mojiMat;
+	Math::Matrix m_mojiTrans;
+	Math::Matrix m_mojiScale;
+	KdTexture m_mojiTex;
 
 	std::vector<Bullet> m_bullets;
 
