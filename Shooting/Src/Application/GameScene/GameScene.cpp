@@ -20,6 +20,9 @@ void C_GameScene::Draw()
 	if (m_gameScreen) { m_gameScreen->Draw(); }
 	if (m_window) { m_window->Draw(); }
 
+	CountDownDraw();
+	StartLogoDraw();
+
 	//プレイヤー
 	if (m_player) { m_player->Draw(); }
 
@@ -30,9 +33,12 @@ void C_GameScene::Draw()
 
 	m_score[0].UiDraw(m_displayScore);
 
-	for (auto& e : m_enemies)
+	if(!m_isStarting)
 	{
-		e->Draw();
+		for (auto& e : m_enemies)
+		{
+			e->Draw();
+		}
 	}
 
 	// 生きている弾だけ描画する
@@ -56,7 +62,6 @@ void C_GameScene::Draw()
 
 
 	if (m_timer) { m_timer->Draw(); }
-	if (m_homeIcon) { m_homeIcon->Draw(); }
 	if (m_level) 
 	{
 		m_level->Level1Draw(); 
@@ -83,12 +88,53 @@ void C_GameScene::Draw()
 
 void C_GameScene::Update()
 {
-
-
 	g_mouse.Update();
-	Action();
-
 	m_fadeIn->SetFlg(true);
+
+	//フェードイン更新
+	if (m_fadeIn->GetFlg()) { m_fadeIn->Update(); }
+
+	CountDownUpdate();
+	StartLogoUpdate();
+
+	// --- カウントダウン中の処理 ---
+	if (m_isStarting)
+	{
+		m_startTimer -= 1.0f / 60.0f; // 1フレーム分（約0.016秒）ずつ減らす
+
+		if (m_startTimer <= 0.0f)
+		{
+			m_isStarting = false; // カウント終了、ゲーム開始！
+		}
+
+	}
+
+	if (!m_isStarting && !m_isGameClear && !m_isGameOver)
+	{
+		// ① 当たり判定を止める
+		Action();
+
+		// ② タイムのカウントを止める
+		m_timer->SetTimerFlg(true);
+
+		// ③ 敵のロジック（射撃など）を止める
+		if (m_bEnemy && !m_bEnemy->GetAliveFlg())
+		{
+			for (auto& e : m_enemies)
+			{
+				if (e->GetAliveFlg()) { e->Update(); e->Shoot(m_enemyBullets); }
+			}
+		}
+		if (m_bEnemy && m_bEnemy->GetAliveFlg())
+		{
+			m_bEnemy->Shoot3WayStep(m_bossBullets); // ボスの攻撃など
+		}
+	}
+	else
+	{
+		// カウント中はタイマーを止める
+		m_timer->SetTimerFlg(false);
+	}
 
 
 	ScoreUpdate();
@@ -102,28 +148,28 @@ void C_GameScene::Update()
 		m_score[i].Update();
 	}
 
-	if (m_bEnemy && !m_bEnemy->GetAliveFlg())
+	/*if (m_bEnemy && !m_bEnemy->GetAliveFlg())
 	{
 		for (auto& e : m_enemies)
 		{
 			if (e->GetAliveFlg())
 			{
 				e->Update();
-
-				e->Shoot(m_enemyBullets);
 			}
-
-
 		}
+	}*/
 
-		for (auto& e : m_enemies) {
-			if (e->IsDead()) {
-				// ここで新しいXを取得してリセットする！
-				float newX = GetSafeRandomX();
-				e->Reset(newX, 380.0f);
-			}
+
+	for (auto& e : m_enemies)
+	{
+		if (e->IsDead())
+		{
+			// ここで新しいXを取得してリセットする！
+			float newX = GetSafeRandomX();
+			e->Reset(newX, 380.0f);
 		}
 	}
+
 
 	// 生きている弾だけ更新する
 	for (auto& b : m_enemyBullets)
@@ -143,12 +189,12 @@ void C_GameScene::Update()
 	if (m_gameScreen) { m_gameScreen->Update(); }
 	if (m_timer) { m_timer->Update(); }
 	if (m_homeIcon) { m_homeIcon->Update(); }
-	if (m_level) 
-	{ 
-	m_level->Level1Update(); 
-	m_level->Level2Update();
-	m_level->Level3Update();
-	m_level->LevelMaxUpdate();
+	if (m_level)
+	{
+		m_level->Level1Update();
+		m_level->Level2Update();
+		m_level->Level3Update();
+		m_level->LevelMaxUpdate();
 	}
 	if (m_window) { m_window->Update(); }
 	if (m_gameClear) { m_gameClear->Update(); }
@@ -173,16 +219,16 @@ void C_GameScene::Update()
 			// 体力 30% ～ 70% の時：円形ショット
 			m_bEnemy->ShootCircleStep(m_bossBullets);
 		}
-		else
+		else if (hpRate > 0.15f)
 		{
-			// 体力 30% 未満の時：もっと激しい攻撃（例：両方を同時に呼ぶなど）
+			// 【発狂モード】3Wayと円形を同時に呼ぶ
 			m_bEnemy->Shoot3WayStep(m_bossBullets);
 			m_bEnemy->ShootCircleStep(m_bossBullets);
 		}
 
 	}
 
-	if(m_bEnemy->GetAliveFlg())
+	if (m_bEnemy->GetAliveFlg())
 	{
 		// ボス弾の移動更新
 		for (auto& b : m_bossBullets)
@@ -200,27 +246,45 @@ void C_GameScene::Update()
 		}
 	}
 
-	// Level 2
-	if (m_totalScore >= 2000 && !m_level->GetLevel2Flg())
+	// --- Update関数内のスコア判定部分 ---
+
+// Level 2
+	if (m_totalScore >= 2000)
 	{
 		m_level->SetLevel2Flg(true);
+		m_maxEnemyCount = 6;  // 上限アップ
 	}
 
 	// Level 3
-	// 「!m_level->GetLevel3Flg()」を入れて、一度だけtrueにするようにします
 	if (m_totalScore >= 5000)
 	{
 		m_level->SetLevel3Flg(true);
+		m_maxEnemyCount = 10; // 上限アップ
 	}
 
-	// Level Max
+	// ★ ここに「補充チェック」を入れる！
+	// 現在のリストの数が上限より少なければ、足りない分だけ新しく作る
+	if (m_enemies.size() < (size_t)m_maxEnemyCount)
+	{
+		float randX = GetSafeRandomX();
+		auto enemy = std::make_unique<C_Enemy>();
+		enemy->Init();
+		enemy->SetPos({ randX, 400.0f }); // 画面の上から出す
+		m_enemies.push_back(std::move(enemy));
+	}
+
+
+	// --- Level Max ---
 	if (m_totalScore >= 9000)
 	{
 		m_level->SetLevelMaxFlg(true);
+		m_level->SetLevel3Flg(false); // Level 3のフラグを下ろす
 
-		if (m_bEnemy) {
+		m_maxEnemyCount = 0; // ★ボス戦なので雑魚の新規沸きを止める（0にする）
+
+		if (m_bEnemy) 
+		{
 			m_bEnemy->SetAliveFlg(true);
-			// 必要ならここでボスのHPをフルにするなどの初期化
 		}
 
 		// 雑魚と弾の一掃
@@ -230,8 +294,7 @@ void C_GameScene::Update()
 
 
 
-	//フェードイン更新
-	if (m_fadeIn->GetFlg()) { m_fadeIn->Update(); }
+
 
 	//フェードアウト更新
 	if (m_fadeOut->GetFlg()) { m_fadeOut->Update(); }
@@ -254,25 +317,36 @@ void C_GameScene::Update()
 	if (GetAsyncKeyState('K') & 0x8000 && !m_isGameOver)
 	{
 		m_player->SetHp(0);
+		
 		m_isGameOver = true;
 	}
 
 	if (GetAsyncKeyState('B') & 0x8000 && !m_isGameClear)
 	{
 		m_bEnemy->SetHp(0);
+		
 		m_isGameClear = true;
 	}
 
+
+	if (m_player->GetHp() <= 0)
+	{
+		m_player->SetAliveFlg(false);
+		m_GameClear = false;
+	}
 
 	if (m_bEnemy->GetHp() <= 0)
 	{
 		m_bEnemy->SetAliveFlg(false);
 		m_isGameClear = true;
+		m_GameClear = true;
 	}
 
 	// --- ゲームオーバー中の処理 ---
 	if (m_isGameOver)
 	{
+		// 1. タイマーを停止
+		m_timer->SetTimerFlg(false);
 		m_gameOver->SetAliveFlg(true);
 
 		m_gameOverTimer--;
@@ -284,7 +358,8 @@ void C_GameScene::Update()
 			if (m_fadeOut && !m_fadeOut->GetFlg())
 			{
 				// 遷移用のデータを確定させる
-				if (m_timer) {
+				if (m_timer) 
+				{
 					m_timer->SetTimerFlg(false);
 					m_lastClearFrame = m_timer->GetTotalFrame();
 				}
@@ -305,6 +380,8 @@ void C_GameScene::Update()
 	// --- ゲームクリアー中の処理 ---
 	if (m_isGameClear)
 	{
+		// 1. タイマーを停止
+		m_timer->SetTimerFlg(false);
 		m_gameClear->SetAliveFlg(true);
 
 		m_gameClearTimer--;
@@ -314,7 +391,8 @@ void C_GameScene::Update()
 		{
 			if (m_fadeOut && !m_fadeOut->GetFlg())
 			{
-				if (m_timer) {
+				if (m_timer) 
+				{
 					m_timer->SetTimerFlg(false);
 					m_lastClearFrame = m_timer->GetTotalFrame();
 				}
@@ -356,11 +434,6 @@ void C_GameScene::Update()
 		//// ※ pResultScene は ResultScene のインスタンスへのポインタと仮定
 		//pResultScene->SetResultTime(s
 	}
-	else
-	{
-		// Rキーを押していない間：常にタイマーを動かす
-		m_timer->SetTimerFlg(true);
-	}
 
 	if (!m_player->GetAliveFlg())
 	{
@@ -387,7 +460,7 @@ void C_GameScene::Update()
 		SCENEMANAGER.SetRequestFadeIn(true);
 
 		//シーンをリザルトに切り替える
-		SCENEMANAGER.ChangeState(new C_ResultScene(m_lastClearFrame, m_lastClearScore, m_totalHitCount));
+		SCENEMANAGER.ChangeState(new C_ResultScene(m_lastClearFrame, m_lastClearScore, m_totalHitCount, m_GameClear));
 	}
 }
 
@@ -405,6 +478,8 @@ void C_GameScene::Init()
 	m_level = new C_Level();
 	m_bEnemy = new C_BossEnemy();
 	m_window = new C_Window();
+
+	CountDownInit();
 
 	if (m_player) { m_player->Init(); }
 	if (m_fadeIn) { m_fadeIn->Init(); }
@@ -438,14 +513,26 @@ void C_GameScene::Init()
 	m_enemies.clear();
 
 
-	for (int i = 0; i < 10; i++)
+	int spawnCount = 0;
+
+	// 現在のレベルフラグを見て出現数を変える
+	//if (m_level->GetLevelMaxFlg()) {
+		//spawnCount = 15; // MAXレベルは大量！
+	
+	m_maxEnemyCount = 3;
+
+	// 決まった数だけループを回す
+	for (int i = 0; i < m_maxEnemyCount; i++)
 	{
-		float randX = GetSafeRandomX(); // 関数を呼ぶだけ！
+		float randX = GetSafeRandomX();
 
 		auto enemy = std::make_unique<C_Enemy>();
 		enemy->Init();
-		// Y座標も (i * -150.0f) などでバラけさせると、ずらし沸きになります
-		enemy->SetPos({ randX,300.0f });
+
+		// まとまって出ると重なってしまうので、i を使って出現タイミング（Y座標）をずらす
+		float offsetY = i * 150.0f;
+		enemy->SetPos({ randX, 400.0f + offsetY });
+
 		m_enemies.push_back(std::move(enemy));
 	}
 
@@ -484,10 +571,10 @@ void C_GameScene::Init()
 	m_bulletRadius = 16;
 	m_charaRadius = 32;
 	m_enemyRadius = 32;
-	m_bossRadius = 90;
+	m_bossRadius = 70;
 	m_iconRadius = 64;
 
-	m_maxEnemies = 10;
+	
 
 	m_gameOverTimer = 360;
 	m_gameClearTimer = 360;
@@ -697,7 +784,7 @@ void C_GameScene::Action()
 
 						// 2. 下方向へのオフセット（ずらす量）を設定 (例: 30.0f)
 						// ※値はボスの画像サイズや爆発エフェクトの大きさに合わせて調整してください。
-						float offsetY = 45.0f;
+						float offsetY = 65.0f;
 
 						// 3. Y座標を調整してセット（一般的な2D座標系ではYを引くと下になります）
 						ex->SetPos({ bossPos.x, bossPos.y - offsetY });
@@ -822,6 +909,95 @@ float C_GameScene::GetSafeRandomX()
 	} while (isOverlapping);
 
 	return randX;
+}
+
+
+void C_GameScene::CountDownDraw()
+{
+	if (!m_isStarting) return;
+
+	int num = (int)m_startTimer;
+	if (num <= 0) return;
+
+	// 数字1つ分の切り取り範囲
+	int digitWidth = 16;
+	int digitHeight = 32;
+	Math::Rectangle rect = { num * digitWidth, 0, digitWidth, digitHeight };
+	Math::Color color = { 1.0f, 1.0f, 1.0f, 1.0f };
+
+	// 計算済みの行列をセット
+	SHADER.m_spriteShader.SetMatrix(m_countMat);
+
+	// 描画
+	SHADER.m_spriteShader.DrawTex(&m_countTex, 0, 0, &rect, &color);
+}
+
+void C_GameScene::CountDownUpdate()
+{
+	if (!m_isStarting) return;
+
+	// 1. 表示する数字の決定 (3, 2, 1)
+	int num = (int)m_startTimer;
+	if (num <= 0) return;
+
+	float fraction = m_startTimer - std::floor(m_startTimer);
+	float currentScale = 1.0f + (fraction * 0.5f);
+
+	m_countScale = Math::Matrix::CreateScale(m_countSize.x * currentScale, m_countSize.y * currentScale, 1.0f);
+	m_countTrans = Math::Matrix::CreateTranslation(m_countPos.x, m_countPos.y, 0);
+	m_countMat = m_countScale * m_countTrans;
+}
+
+void C_GameScene::CountDownInit()
+{
+	// 画像の読み込み
+	m_countTex.Load("Texture/Score/Suuji.png");
+
+	// 初期の配置設定（画面中央など）
+	m_countPos = { -100, 0 };
+	m_countSize = { 3.0f, 3.0f }; // 1数字あたりのサイズ
+
+	// ロゴ：START! 用
+	m_startTex.Load("Texture/Game/Start.png");
+	m_startPos = { -100, 0 };
+	m_startSize = { 1.0f, 1.0f };
+	m_startAlpha = 1.0f;
+}
+
+void C_GameScene::StartLogoDraw()
+{
+	if (m_startTimer > 0.0f || m_startTimer <= -1.0f) return;
+
+	Math::Rectangle rect = { 0, 0, 190, 51 };
+	Math::Color color = { 1.0f, 1.0f, 1.0f, m_startAlpha };
+
+	SHADER.m_spriteShader.SetMatrix(m_startMat);
+	SHADER.m_spriteShader.DrawTex(&m_startTex, 0, 0, &rect, &color);
+}
+
+void C_GameScene::StartLogoUpdate()
+{
+	if (m_isStarting) return;
+
+	float alphaSpeed = 1.0f / 60.0f; // 1秒かけて消える速度（お好みで調整）
+	m_startAlpha -= alphaSpeed;
+
+	if (m_startAlpha <= m_startAlphaMin)
+	{
+		m_startAlpha = m_startAlphaMin;
+	}
+
+	// 2. 表示終了判定（完全に透明になったら行列計算も不要）
+	if (m_startAlpha <= m_startAlphaMin) return;
+
+	// 3. 行列計算（形式を数字用と統一）
+	// 演出：少しずつ拡大していく（abs(m_startTimer)の代わりに経過時間を利用してもOK）
+	float fraction = 1.0f - m_startAlpha; // 消え具合（0.0～1.0）
+	float currentScale = 1.0f + (fraction * 0.5f);
+
+	m_startScale = Math::Matrix::CreateScale(m_startSize.x * currentScale, m_startSize.y * currentScale, 1.0f);
+	m_startTrans = Math::Matrix::CreateTranslation(m_startPos.x, m_startPos.y, 0);
+	m_startMat = m_startScale * m_startTrans;
 }
 
 void C_GameScene::Release()

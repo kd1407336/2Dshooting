@@ -38,7 +38,6 @@ public:
 	void Update() override;
 	void Init() override;
 
-	
 
 	bool GetFadeInFlg() { return m_fadeInFlg; }
 
@@ -47,6 +46,14 @@ public:
 	void ScoreUpdate()override;
 	void HomeIconUpdate()override;
 	float GetSafeRandomX();
+
+
+	void CountDownDraw();
+	void CountDownUpdate();
+	void CountDownInit();
+
+	void StartLogoDraw();
+	void StartLogoUpdate();
 
 private:
 
@@ -76,6 +83,28 @@ private:
 
 	std::vector<std::unique_ptr<C_Enemy>> m_enemies;
 
+
+	Math::Vector2 m_startPos;
+	Math::Vector2 m_startSize;
+	Math::Matrix  m_startMat;
+	Math::Matrix  m_startScale;
+	Math::Matrix  m_startTrans;
+	KdTexture     m_startTex;   // 画像データ
+
+	Math::Vector2 m_countPos;
+	Math::Vector2 m_countSize;
+	Math::Matrix  m_countMat;
+	Math::Matrix  m_countScale;
+	Math::Matrix  m_countTrans;
+	KdTexture     m_countTex;
+
+
+	float m_startAlpha = 1.0f;     // STARTロゴの透明度 
+	float m_startAlphaMin = 0.0f;
+	KdTexture m_startLogoTex;      
+	float m_countDownScale = 1.0f; 
+
+
 	bool m_fadeInFlg;
 	bool m_resultFadeFlg;
 	bool m_titleFadeFlg;
@@ -92,7 +121,7 @@ private:
 	int m_bossRadius;
 	int m_iconRadius;
 
-	int m_maxEnemies;
+	int m_maxEnemyCount;
 
 	int m_killPoint;
 	int m_totalScore;
@@ -103,8 +132,14 @@ private:
 	int m_lastClearFrame = 0; // クリアタイム保持用
 	int m_lastClearScore = 0;
 
+	float m_startTimer = 4.0f; 
+	bool m_isStarting = true;  
+
+	bool m_GameClear = true;
+
 	std::mt19937 m_mt{ std::random_device{}() }; // クラス作成時に一度だけ初期化
 	std::uniform_int_distribution<int> m_distX{ -610, 250 };
+	//std::uniform_int_distribution<int> m_distExplosion{ -60, 60 };
 
 	void Release();
 };

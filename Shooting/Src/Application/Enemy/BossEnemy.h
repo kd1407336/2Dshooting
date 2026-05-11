@@ -71,6 +71,14 @@ private:
 	Math::Matrix m_mojiScale;
 	KdTexture m_mojiTex;
 
+	// --- ボスHPバーの左に表示する「BOSS」ロゴ用 ---
+	Math::Vector2 m_bossLogoPos;
+	Math::Vector2 m_bossLogoSize;
+	Math::Matrix  m_bossLogoScaleMat; // 変数名をより明確に
+	Math::Matrix  m_bossLogoTransMat; // 変数名をより明確に
+	Math::Matrix  m_bossLogoMat;      // 最終的な合成行列
+	KdTexture     m_bossLogoTex;
+
 	float m_hp;
 	float m_hpMax;
 	float m_hpDraw;

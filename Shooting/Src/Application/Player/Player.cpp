@@ -3,7 +3,7 @@
 
 C_Player::C_Player()
 {
-	m_pos = { 0,0 };
+	m_pos = { -100,-150 };
 	m_size = { 1.0f,1.0f };
 	m_dirX = 7;
 	m_dirY = 3;

@@ -37,7 +37,7 @@ void C_ClockIcon::Update()
 
 void C_ClockIcon::Init()
 {
-	m_pos = { -200,200 };
+	m_pos = { -190,60 };
 	m_size = { 1.3f,1.3f };
 
 	m_alpha = 1.0f;

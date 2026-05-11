@@ -131,7 +131,7 @@ void C_Level::Level3Draw()
 
 void C_Level::LevelMaxInit()
 {
-    m_levelMaxPos = { 430,75 };
+    m_levelMaxPos = { 440,75 };
     m_levelMaxSize = { 1.0f, 1.0f };
     m_alphaMax = 0.0f;
 

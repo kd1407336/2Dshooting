@@ -4,7 +4,7 @@
 class C_FadeIn;
 class C_FadeOut;
 class C_ClockIcon;
-
+class C_ResultLogo;
 
 // 演出の状態
 enum class ResultStep {
@@ -20,7 +20,7 @@ public:
 
 	C_ResultScene(){}
 	// 引数あり
-	C_ResultScene(int clearFrame,int clearScore,int hitCount); 
+	C_ResultScene(int clearFrame,int clearScore,int hitCount, bool isClear);
 
 	~C_ResultScene()override { Release(); }
 	
@@ -38,6 +38,10 @@ public:
 	void WindowUpdate();
 	void WindowInit();
 
+	void ScoreDraw();
+	void ScoreUpdate();
+	void ScoreInit();
+
 	void SetResultTime(int totalFrame) { m_resultFrame = totalFrame; }
 
 private:
@@ -45,6 +49,7 @@ private:
 	C_FadeIn* m_fadeIn = nullptr;
 	C_FadeOut* m_fadeOut = nullptr;
 	C_ClockIcon* m_clockIcon = nullptr;
+	C_ResultLogo* m_resultLogo = nullptr; 
 
 	void Release();
 
@@ -62,6 +67,15 @@ private:
 	Math::Matrix m_windowTrans;
 	KdTexture m_windowTex;
 
+
+	//スコア文字用
+	Math::Vector2 m_scoreMojiPos;
+	Math::Vector2 m_scoreMojiSize;
+	Math::Matrix m_scoreMojiMat;
+	Math::Matrix m_scoreMojiTrans;
+	Math::Matrix m_scoreMojiScale;
+	KdTexture m_scoreMojiTex;
+
 	int m_displayScore = 0;
 	float m_displayTimer = 0;
 	int m_resultFrame = 0; // ここにクリア時のタイムを保存する
@@ -74,5 +88,8 @@ private:
 	ResultStep m_step = ResultStep::BaseScore;
 	int m_waitTimer = 0; // ステップ間の待ち時間用
 	float m_colorLerp = 0.0f; 
+
+	KdTexture m_resultLogoTex; 
+	bool      m_isClear;       // 判定保持用
 
 };

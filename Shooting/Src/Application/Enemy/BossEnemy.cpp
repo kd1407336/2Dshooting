@@ -7,7 +7,7 @@ void C_BossEnemy::Draw()
 	if (m_aliveFlg)
 	{
 		SHADER.m_spriteShader.SetMatrix(m_mat);
-		SHADER.m_spriteShader.DrawTex(&m_tex, Math::Rectangle(0, 0, 64, 64), 1.0f);
+		SHADER.m_spriteShader.DrawTex(&m_tex, Math::Rectangle(0, 0, 128, 128), 1.0f);
 	}
 
     HpDraw();
@@ -22,10 +22,10 @@ void C_BossEnemy::Update()
     switch (m_state) {
     case BossState::Appear:
         // --- 登場シーン：上から下へ ---
-        m_pos.y -= 3.0f;
+        m_pos.y -= 2.0f;
 
-        if (m_pos.y <= 280) {
-            m_pos.y = 280;
+        if (m_pos.y <= 200) {
+            m_pos.y = 200;
             m_state = BossState::Move; // 指定位置に来たら「移動状態」へ
         }
         break;
@@ -43,7 +43,7 @@ void C_BossEnemy::Update()
         m_pos.x = centerX + sinf(m_moveTimer) * amplitude;
 
         // --- 上下のふわふわ（お好みで） ---
-        m_pos.y = 280 + sinf(m_moveTimer * 0.5f) * 15.0f;
+        m_pos.y = 200 + sinf(m_moveTimer * 0.5f) * 15.0f;
         break;
     }
 
@@ -59,10 +59,10 @@ void C_BossEnemy::Update()
 void C_BossEnemy::Init()
 {
 	m_pos = { 0,460 };
-	m_size = { 3.0f,3.0f };
+	m_size = { 2.8f,2.8f };
     m_shotTimer = 60; // ← これを追加（出現してから1秒後に発射開始）
     m_hp = 100;
-	m_tex.Load("Texture/Enemy/Enemy.png");
+	m_tex.Load("Texture/Enemy/BossEnemy.png");
 	m_aliveFlg = false;
 	m_hitFlg = false;
 
@@ -90,6 +90,15 @@ void C_BossEnemy::HpDraw()
         SHADER.m_spriteShader.SetMatrix(m_hpMat); // m_hp(すぐ減る方)を使用
         Math::Color greenColor = { 0.0f, 1.0f, 0.0f, 1.0f }; // 緑色
         SHADER.m_spriteShader.DrawTex(&m_hpTex, 0, 0, &rect, &greenColor);
+
+
+        // BOSSロゴの描画
+        Math::Rectangle bossRect = { 0, 0, 102, 41 };
+        Math::Color color = { 1.0f, 1.0f, 1.0f, 1.0f };
+
+        SHADER.m_spriteShader.SetMatrix(m_bossLogoMat);
+        SHADER.m_spriteShader.DrawTex(&m_bossLogoTex, 0, 0, &bossRect, &color);
+
     }
 }
 
@@ -150,6 +159,15 @@ void C_BossEnemy::HpUpdate()
     Math::Matrix berTransMat = Math::Matrix::CreateTranslation(m_hpBerPos.x, m_hpBerPos.y, 0);
 
     m_hpBerMat = berScaleMat * berTransMat;
+
+
+    // 行列の計算を分離して行う
+    m_bossLogoScaleMat = Math::Matrix::CreateScale(m_bossLogoSize.x, m_bossLogoSize.y, 1.0f);
+    m_bossLogoTransMat = Math::Matrix::CreateTranslation(m_bossLogoPos.x, m_bossLogoPos.y, 0.0f);
+
+    // 合成 (S * T)
+    m_bossLogoMat = m_bossLogoScaleMat * m_bossLogoTransMat;
+
 }
 
 
@@ -159,14 +177,21 @@ void C_BossEnemy::HpInit()
     m_hp = m_hpMax;
     m_hpDraw = m_hpMax;
 
-    m_hpPos = { 0,320 };
+    m_hpPos = { -100,320 };
     m_hpSize = { 1.5f,1.2f };
 
 
-    m_hpBerPos = { 0,320 };
+    m_hpBerPos = { -100,320 };
     m_hpBerSize = { 1.5f,1.2f };
 
     m_hpTex.Load("Texture/HpBer/HpBer.png");
+
+
+    m_bossLogoTex.Load("Texture/Boss/Boss.png");
+
+    // HPバーの座標(m_hpPos)を基準に、左(-220)・少し上(10)に配置
+    m_bossLogoPos = { -370,320 };
+    m_bossLogoSize = { 1.2f, 1.2f }; // 少し大きめに設定
 
 }
 
@@ -184,36 +209,36 @@ void C_BossEnemy::ShootCircleStep(std::vector<std::unique_ptr<C_BossBullet>>& li
     m_shotTimer--;
     if (m_shotTimer > 0) return;
 
-    for (auto& b : list)
+    int wayCount = 10;      // 3方向（扇形）
+    float spread = 30.0f;  // 弾と弾の間の角度（広がり具合）
+    float baseAngle = 270.0f; // 真下の角度
+
+    for (int i = 0; i < wayCount; i++)
     {
-        if (!b->GetAliveFlg())
+        // 真下(270度)を中心に、i=0で250度、i=1で270度、i=2で290度になる計算
+        float angleOffset = (i - wayCount / 2) * spread;
+        float finalRad = (baseAngle + angleOffset) * (3.14159f / 180.0f);
+
+        // 空いている弾を探して発射
+        for (auto& b : list)
         {
-            // --- 前方（下向き）だけに限定して撃ち分ける ---
-            // m_currentShotAngle を使って 220度 ～ 320度 の間を往復させる例
-            m_currentShotAngle += 15.0f;
+            if (!b->GetAliveFlg())
+            {
+                // 速度の設定（4.0fの部分を大きくすると速くなります）
+                Math::Vector2 v = { cosf(finalRad) * 4.0f, sinf(finalRad) * 4.0f };
 
-            // 指定の角度を超えたら反対側に戻す（これで後ろに飛ばない）
-            if (m_currentShotAngle > 320.0f || m_currentShotAngle < 220.0f) {
-                m_currentShotAngle = 220.0f;
+                b->SetPos(m_pos + Math::Vector2(0, -60.0f));
+                b->SetVelocity(v);
+                b->SetAliveFlg(true);
+                break;
             }
-
-            float rad = m_currentShotAngle * (3.14159f / 180.0f);
-
-            // 弾の速度（4.0f）
-            Math::Vector2 v = { cosf(rad) * 4.0f, sinf(rad) * 4.0f };
-
-            // 発射位置（ボスの中心 m_pos から少しずらす）
-            Math::Vector2 offset = { cosf(rad) * 40.0f, sinf(rad) * 40.0f };
-
-            b->SetPos(m_pos + offset);
-            b->SetVelocity(v);
-            b->SetAliveFlg(true);
-
-            m_shotTimer = 10;
-            return;
         }
     }
+
+    m_shotTimer = 30; // 次の発射までの間隔（お好みで調整）
+    return;
 }
+
 
 void C_BossEnemy::Shoot3WayStep(std::vector<std::unique_ptr<C_BossBullet>>& list)
 {
@@ -240,7 +265,7 @@ void C_BossEnemy::Shoot3WayStep(std::vector<std::unique_ptr<C_BossBullet>>& list
         if (!b->GetAliveFlg())
         {
             // 弾をセット
-            b->SetPos(m_pos);
+            b->SetPos(m_pos + Math::Vector2(0, -60.0f));
             b->SetVelocity(vels[fireCount]); // 0:中央、1:右、2:左 の順で適用
             b->SetAliveFlg(true);
 

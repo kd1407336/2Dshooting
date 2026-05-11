@@ -15,7 +15,7 @@ void C_EnemyBullet::Update()
 		m_pos += m_velocity;
 
 		// 画面端（下は-360ですが、余裕をもって-400）を超えたら消す
-		if (m_pos.y < -400.0f)
+		if (m_pos.y  > 360 || m_pos.y < -400.0f)
 		{
 			m_aliveFlg = false;
 		}

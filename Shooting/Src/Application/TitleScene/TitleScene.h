@@ -24,6 +24,14 @@ public:
 	void ScreenUpdate();
 	void ScreenInit();
 
+	void PlayDraw();
+	void PlayUpdate();
+	void PlayInit();
+
+	void SpaceDraw();
+	void SpaceUpdate();
+	void SpaceInit();
+
 	void SetFadeInFlg(bool fadeinflg) { m_fadeInFlg = fadeinflg; }
 	bool GetFadeInFlg() { return m_fadeInFlg; }
 
@@ -48,10 +56,32 @@ private:
 	Math::Matrix m_screenScale;
 	KdTexture    m_screenTex;
 
-	float m_alpha;;
+	Math::Matrix m_screen1Pos;
+	Math::Matrix m_screen1Size;
+	Math::Matrix m_screen1Mat;
+	Math::Matrix m_screen1Scale;
+	Math::Matrix m_screen1Trans;
+
+	Math::Vector2 m_playPos;
+	Math::Vector2 m_playSize;
+	Math::Matrix m_playMat;
+	Math::Matrix m_playScale;
+	Math::Matrix m_playTrans;
+	KdTexture    m_playTex;
+
+	Math::Vector2 m_spacePos;
+	Math::Vector2 m_spaceSize;
+	Math::Matrix m_spaceMat;
+	Math::Matrix m_spaceScale;
+	Math::Matrix m_spaceTrans;
+	KdTexture    m_spaceTex;
+
+	float m_alpha;
+	float m_alphaSpeed;
 	float m_alphaMax;
 	float m_alphaMin;
 	float m_delet;
+	float m_alphaReset;
 
 	void Release();
 

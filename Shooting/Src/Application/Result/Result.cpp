@@ -2,14 +2,22 @@
 #include "../Fade/FadeIn.h"
 #include "../Fade/FadeOut.h"
 #include "Application/ClockIcon/ClockIcon.h"
+#include "Application/Result/ResultLogo.h" 
 #include "Application/SceneManager/SceneManager.h"
 
-C_ResultScene::C_ResultScene(int clearFrame,int clearScore,int hitCount)
+C_ResultScene::C_ResultScene(int clearFrame,int clearScore,int hitCount, bool isClear)
 	  : m_resultFrame(clearFrame),
 		m_clearScore(clearScore),
-		m_totalHit(hitCount)
+		m_totalHit(hitCount),
+		m_isClear(isClear)
 {
-	// ここには画像ロードなどの処理を書く
+
+
+	// ロゴクラスの生成
+	m_resultLogo = new C_ResultLogo();
+
+	// ロゴの初期化（ここで true/false を渡すことで内部の変数が切り替わる）
+	m_resultLogo->Init(m_isClear);
 }
 
 void C_ResultScene::Draw()
@@ -17,9 +25,10 @@ void C_ResultScene::Draw()
 	WindowDraw();
 	TotalTimerDraw();
 	TotalScoreDraw();
-	
+	ScoreDraw();
 
 	if (m_clockIcon) { m_clockIcon->Draw(); }
+	if (m_resultLogo) { m_resultLogo->Draw(); }
 
 	if(m_fadeIn){m_fadeIn->Draw();}
 	if(m_fadeOut){m_fadeOut->Draw();}
@@ -31,7 +40,10 @@ void C_ResultScene::Update()
 	if (m_clockIcon) { m_clockIcon->Update(); m_clockIcon->SetAliveFlg(true); }
 	if (m_fadeIn) { m_fadeIn->Update(); }
 	if (m_fadeOut) { m_fadeOut->Update(); }
+	// ロゴの更新（フェードや行列計算が行われる）
+	if (m_resultLogo){m_resultLogo->Update();}
 
+	ScoreUpdate();
 	TotalScoreUpdate();
 	WindowUpdate();
 
@@ -63,7 +75,7 @@ void C_ResultScene::Update()
 
 void C_ResultScene::Init()
 {
-	m_pos = { 0,200 };
+	m_pos = { 10,60 };
 	m_size = { 2.0f,2.0f };
 	m_tex.Load("Texture/Score/Suuji.png");
 
@@ -80,6 +92,7 @@ void C_ResultScene::Init()
 
 	TotalScoreInit();
 	WindowInit();
+	ScoreInit();
 }
 
 void C_ResultScene::TotalTimerDraw()
@@ -104,8 +117,14 @@ void C_ResultScene::TotalTimerDraw()
 	int digitHeight = 32;
 	int spacing = 2;
 
-	// 文字列全体の幅を計算（中央揃えにする場合）
+	// 文字列全体の幅を計算
 	float totalWidth = (float)timeStr.size() * (digitWidth + spacing);
+
+	// ★追加：1分を超えた場合（文字数が増えた場合）の離し具合を調整
+	float baseOffsetX = 0.0f;
+	if (minutes > 0) {
+		baseOffsetX = 30.0f; // ここの数値を大きくすると、アイコンからより離れます
+	}
 
 	for (int i = 0; i < (int)timeStr.size(); i++)
 	{
@@ -118,21 +137,17 @@ void C_ResultScene::TotalTimerDraw()
 		}
 		else { continue; }
 
-		// --- ここから行列計算を追加 ---
+		// ① 各文字の並び順に、baseOffsetX を加算して全体をずらす
+		float offsetX = (i * (digitWidth + spacing)) - (totalWidth / 2.0f) + baseOffsetX;
 
-		// ① 各文字を横に並べるための移動量を計算
-		float offsetX = (i * (digitWidth + spacing)) - (totalWidth / 2.0f);
-
-		// ② 各文字ごとのオフセット行列を作成
+		// ② オフセット行列を作成
 		Math::Matrix offsetMat = Math::Matrix::CreateTranslation(offsetX, 0, 0);
 
-		// ③ Updateで計算済みの m_mat (Scale * Trans) と掛け合わせる
+		// ③ 合成
 		Math::Matrix finalMat = offsetMat * m_mat;
 
-		// シェーダーに渡す
 		SHADER.m_spriteShader.SetMatrix(finalMat);
 
-		// 描画実行
 		Math::Rectangle rect = { num * digitWidth, 0, digitWidth, digitHeight };
 		SHADER.m_spriteShader.DrawTex(&m_tex, 0, 0, &rect);
 	}
@@ -190,8 +205,8 @@ void C_ResultScene::TotalScoreDraw()
 		float bScale = 1.0f;
 		int bSpacing = 2;
 
-		float startX = m_scorePos.x + 100.0f;
-		float startY = m_scorePos.y - 40.0f;
+		float startX = m_scorePos.x + 160.0f;
+		float startY = m_scorePos.y - 30.0f;
 
 		// ボーナスの色設定
 		Math::Color bColor = { 1.0f, 1.0f, 0.0f, 1.0f }; // 基本は黄色
@@ -200,6 +215,7 @@ void C_ResultScene::TotalScoreDraw()
 			// 終了後はアルファ値を m_colorLerp に同期させてじわ～っと消す
 			bColor = { 1.0f, 1.0f, 0.0f, m_colorLerp };
 		}
+
 
 		for (int i = 0; i < (int)bonusStr.size(); i++) {
 			int num = 0;
@@ -268,7 +284,7 @@ void C_ResultScene::TotalScoreUpdate()
 
 void C_ResultScene::TotalScoreInit()
 {
-	m_scorePos = { 0,0 };
+	m_scorePos = { 95,-100 };
 	m_scoreSize = { 2.0f,2.0f };
 	m_scoreTex.Load("Texture/Score/Suuji.png");
 }
@@ -293,8 +309,32 @@ void C_ResultScene::WindowInit()
 	m_windowTex.Load("Texture/Window/Window.png");
 }
 
+void C_ResultScene::ScoreDraw()
+{
+	SHADER.m_spriteShader.SetMatrix(m_scoreMojiMat);
+	// 描画
+	SHADER.m_spriteShader.DrawTex(&m_scoreMojiTex, Math::Rectangle(0, 0, 140, 50), 1.0f);
+}
+
+void C_ResultScene::ScoreUpdate()
+{
+	m_scoreMojiTrans = Math::Matrix::CreateTranslation(m_scoreMojiPos.x, m_scoreMojiPos.y, 0);
+	m_scoreMojiScale = Math::Matrix::CreateScale(m_scoreMojiSize.x, m_scoreMojiSize.y, 0);
+	m_scoreMojiMat = m_scoreMojiScale * m_scoreMojiTrans;
+}
+
+void C_ResultScene::ScoreInit()
+{
+	m_scoreMojiPos = { -190,-100 };
+	m_scoreMojiSize = { 1.5f,1.5f };
+	m_scoreMojiTex.Load("Texture/Score/Score.png");
+}
+
+
 void C_ResultScene::Release()
 {
 	if (m_fadeIn) { delete m_fadeIn; m_fadeIn = nullptr; }
 	if (m_fadeOut) { delete m_fadeOut; m_fadeOut = nullptr; }
+	// メモリ解放
+	if (m_resultLogo){delete m_resultLogo;m_resultLogo = nullptr;}
 }

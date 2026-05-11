@@ -20,4 +20,8 @@ private:
 	Math::Matrix m_scale;
 	Math::Matrix m_trans;
 	KdTexture m_tex;
+
+	Math::Matrix m_screen1Mat;
+	Math::Matrix m_screen1Scale;
+	Math::Matrix m_screen1Trans;
 };

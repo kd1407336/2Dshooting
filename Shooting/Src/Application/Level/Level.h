@@ -52,24 +52,27 @@ private:
 	Math::Matrix m_levelTrans;
 	KdTexture m_levelTex;
 
+	
 	Math::Vector2 m_level3Pos;
 	Math::Vector2 m_level3Size;
-	Math::Matrix  m_level3Mat;
-	Math::Matrix m_level3Scale;
+	Math::Matrix m_level3Mat;
 	Math::Matrix m_level3Trans;
-	KdTexture     m_level3Tex;
-	float         m_alpha3;
-	bool          m_level3Flg;
+	Math::Matrix m_level3Scale;
+	KdTexture m_level3Tex;
+	float m_alpha3;
+	bool m_level3Flg;
 
-	// LevelMaxópÇÃïœêî
 	Math::Vector2 m_levelMaxPos;
 	Math::Vector2 m_levelMaxSize;
-	Math::Matrix  m_levelMaxMat;
-	Math::Matrix m_levelMaxScale;
+	Math::Matrix m_levelMaxMat;
 	Math::Matrix m_levelMaxTrans;
-	KdTexture     m_levelMaxTex;
-	float         m_alphaMax;
-	bool          m_levelMaxFlg;
+	Math::Matrix m_levelMaxScale;
+	KdTexture m_levelMaxTex;
+	float m_alphaMax;
+	bool m_levelMaxFlg;
+
+
+
 
 	float m_alpha1; // Level 1 ÇÃìßñæìx 
 	float m_alpha2; // Level 2 ÇÃìßñæìx 
