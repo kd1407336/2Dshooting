@@ -109,6 +109,9 @@
     <Filter Include="Src\Application\ResultLogo">
       <UniqueIdentifier>{709d42d6-8a73-4f8a-9b8f-a9228b736ea6}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Src\Application\Image">
+      <UniqueIdentifier>{d0fb5e67-d0ea-4b38-8e7e-61ce6a567471}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Pch.h">
@@ -282,6 +285,9 @@
     <ClInclude Include="Src\Application\Result\ResultLogo.h">
       <Filter>Src\Application\Result</Filter>
     </ClInclude>
+    <ClInclude Include="Src\Application\Image\Image.h">
+      <Filter>Src\Application\MouseManager</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Pch.cpp">
@@ -421,6 +427,9 @@
     </ClCompile>
     <ClCompile Include="Src\Application\Result\ResultLogo.cpp">
       <Filter>Src\Application\Result</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Application\Image\Image.cpp">
+      <Filter>Src\Application\Image</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

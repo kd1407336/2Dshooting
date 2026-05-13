@@ -58,7 +58,7 @@ void C_Timer::Update()
 
 void C_Timer::Init()
 {
-	m_pos = { 440,-90 };
+	m_pos = { 440,100 };
 	m_size = { 1.0f,1.0f };
 	m_timer = 0;
 	m_timerCnt = 0;
@@ -85,8 +85,7 @@ void C_Timer::MojiUpdate()
 
 void C_Timer::MojiInit()
 {
-	m_mojiPos = { 375,-90
- 	};
+	m_mojiPos = { 375,100};
 	m_mojiSize = { 1.0f,1.0f };
 	m_mojiTex.Load("Texture/Timer/Time.png");
 }

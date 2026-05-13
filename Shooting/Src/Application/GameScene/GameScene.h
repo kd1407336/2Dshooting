@@ -55,6 +55,7 @@ public:
 	void StartLogoDraw();
 	void StartLogoUpdate();
 
+
 private:
 
 	C_Player*		m_player = nullptr;

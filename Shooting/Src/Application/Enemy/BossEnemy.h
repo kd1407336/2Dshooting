@@ -39,6 +39,9 @@ public:
 	void ShootCircleStep(std::vector<std::unique_ptr<C_BossBullet>>& list);
 	void Shoot3WayStep(std::vector<std::unique_ptr<C_BossBullet>>& list);
 	void ShootCircle(std::vector<std::unique_ptr<C_BossBullet>>& list);
+	void C_BossEnemy::ShootAimNWay(std::vector<std::unique_ptr<C_BossBullet>>& list, Math::Vector2 playerPos);
+
+
 
 	void SetHp(float hp) { m_hp = hp; }
 	float GetHp() { return m_hp; }

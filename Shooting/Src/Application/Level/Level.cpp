@@ -27,7 +27,7 @@ void C_Level::Level1Update()
 
 void C_Level::Level1Init()
 {
-	m_pos = { 397,80 };
+	m_pos = { 397,-65 };
 	m_size = { 1.0f,1.0f };
 	m_alpha1 = 1.0f;
 	m_fadeSpeed = 0.01f;
@@ -70,7 +70,7 @@ void C_Level::Level2Update()
 
 void C_Level::Level2Init()
 {
-	m_levelPos = { 400,75 };
+	m_levelPos = { 400,-60 };
 	m_levelSize = { 1.0f,1.0f };
 	m_alpha2 = 0.0f;
 	m_levelTex.Load("Texture/Level/Level2.png");
@@ -85,7 +85,7 @@ void C_Level::Level2Init()
 void C_Level::Level3Init()
 {
     // 座標とサイズの設定
-    m_level3Pos = { 400, 75 };
+    m_level3Pos = { 400, -60 };
     m_level3Size = { 1.0f, 1.0f };
     m_alpha3 = 0.0f;
     m_alpha3Speed = 0.01f;
@@ -131,7 +131,7 @@ void C_Level::Level3Draw()
 
 void C_Level::LevelMaxInit()
 {
-    m_levelMaxPos = { 440,75 };
+    m_levelMaxPos = { 440,-60 };
     m_levelMaxSize = { 1.0f, 1.0f };
     m_alphaMax = 0.0f;
 

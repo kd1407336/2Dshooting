@@ -72,6 +72,8 @@ bool Application::Init(int w, int h)
 	// シェーダー初期化
 	SHADER.Init();
 
+	ShowCursor(FALSE);
+
 	//===================================================================
 	// XAudio2
 	//===================================================================
@@ -223,7 +225,7 @@ void Application::Execute()
 		// BackBuffer -> FrontBuffer
 		D3D.GetSwapChain()->Present(0, 0);
 
-
+		
 		//=========================================
 		//
 		// フレームレート制御

@@ -30,6 +30,11 @@ private:
 	KdTexture m_tex;
 	bool m_aliveFlg = false;
 
+	float m_anime;
+	float m_animeSpeed;
+	float m_animeMax;
+	float m_animeReset;
+
 	// 1フレームあたりの移動量（方向と速さ）を保持する変数
 	Math::Vector2 m_velocity = { 0.0f, 0.0f };
 

@@ -7,11 +7,16 @@ class C_ClockIcon;
 class C_ResultLogo;
 
 // 演出の状態
-enum class ResultStep {
-	BaseScore,    // 敵を倒したスコアまで増える
-	Wait,         // 少しの間（余韻）
-	AddBonus,     // ボーナス分がさらに乗る
-	Finish        // 完了
+enum class ResultStep 
+{
+	
+	BaseScore,      // 基本スコア表示
+	WaitHit,        // 被弾ボーナス前の待ち
+	AddHitBonus,    // 被弾ボーナスを表示
+	WaitTime,       // タイムボーナス合算前の待ち
+	AddTimeBonus,   // タイムボーナスを合算
+	Finish          // メインスコアへ加算開始
+
 };
 
 class C_ResultScene : public C_State
@@ -29,6 +34,7 @@ public:
 	void Init()override;
 
 	void TotalTimerDraw();
+	void TotalTimerUpdate();
 
 	void TotalScoreDraw();
 	void TotalScoreUpdate();
@@ -78,12 +84,19 @@ private:
 
 	int m_displayScore = 0;
 	float m_displayTimer = 0;
-	int m_resultFrame = 0; // ここにクリア時のタイムを保存する
+	
 	int m_clearScore = 0;
 	int m_totalHit = 0;
 	int m_baseBonus = 10000;
 	int m_penaltyPerHit = 1000;
 	int m_bonus = 0;
+
+
+	int m_resultFrame = 0; // ここにクリア時のタイムを保存する
+	int m_baseTimerBonus = 10000;
+	int m_timerBonus = 0;
+	
+	int m_currentBonusDisplay = 0; // 右側に表示するボーナス合算値用
 
 	ResultStep m_step = ResultStep::BaseScore;
 	int m_waitTimer = 0; // ステップ間の待ち時間用

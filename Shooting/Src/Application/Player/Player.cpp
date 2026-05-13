@@ -246,11 +246,11 @@ void C_Player::HpUpdate()
 
 void C_Player::HpInit()
 {
-	m_hpPos = { 470,-30 };
+	m_hpPos = { 470,0 };
 	m_hpSize = { 1.0f,1.0f };
 
 
-	m_hpBerPos = { 470,-30 };
+	m_hpBerPos = { 470,0 };
 	m_hpBerSize = { 1.0f,1.0f };
 
 	m_hpTex.Load("Texture/HpBer/HpBer.png");
@@ -335,8 +335,8 @@ void C_Player::BulletInit()
 	m_bulletPos ={ 0,0 };
 	m_bulletSize = { 1.0f,1.0f };
 	m_shotInterval = 0;
-	m_shotIntervalMax = 10;
-	m_bulletTex.Load("Texture/Bullet/Bullet.png");
+	m_shotIntervalMax = 15;
+	m_bulletTex.Load("Texture/Bullet/PlayerBullet.png");
 	m_bulletFlg = false;
 }
 
@@ -355,7 +355,7 @@ void C_Player::MojiUpdate()
 
 void C_Player::MojiInit()
 {
-	m_mojiPos = { 355,0 };
+	m_mojiPos = { 355,30 };
 	m_mojiSize = { 1.0f,1.0f };
 	m_mojiTex.Load("Texture/HpBer/Hp.png");
 }

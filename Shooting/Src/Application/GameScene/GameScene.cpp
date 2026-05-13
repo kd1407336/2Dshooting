@@ -125,10 +125,6 @@ void C_GameScene::Update()
 				if (e->GetAliveFlg()) { e->Update(); e->Shoot(m_enemyBullets); }
 			}
 		}
-		if (m_bEnemy && m_bEnemy->GetAliveFlg())
-		{
-			m_bEnemy->Shoot3WayStep(m_bossBullets); // ボスの攻撃など
-		}
 	}
 	else
 	{
@@ -212,12 +208,13 @@ void C_GameScene::Update()
 		if (hpRate > 0.7f)
 		{
 			// 体力 70% 以上の時：通常の3方向ショット
-			m_bEnemy->Shoot3WayStep(m_bossBullets);
+			m_bEnemy->ShootCircleStep(m_bossBullets);
 		}
 		else if (hpRate > 0.3f)
 		{
 			// 体力 30% ～ 70% の時：円形ショット
 			m_bEnemy->ShootCircleStep(m_bossBullets);
+			m_bEnemy->ShootAimNWay(m_bossBullets,m_player->GetPos());
 		}
 		else if (hpRate > 0.15f)
 		{
@@ -252,14 +249,14 @@ void C_GameScene::Update()
 	if (m_totalScore >= 2000)
 	{
 		m_level->SetLevel2Flg(true);
-		m_maxEnemyCount = 6;  // 上限アップ
+		m_maxEnemyCount = 9;  // 上限アップ
 	}
 
 	// Level 3
-	if (m_totalScore >= 5000)
+	if (m_totalScore >= 7000)
 	{
 		m_level->SetLevel3Flg(true);
-		m_maxEnemyCount = 10; // 上限アップ
+		m_maxEnemyCount = 13; // 上限アップ
 	}
 
 	// ★ ここに「補充チェック」を入れる！
@@ -275,7 +272,7 @@ void C_GameScene::Update()
 
 
 	// --- Level Max ---
-	if (m_totalScore >= 9000)
+	if (m_totalScore >= 12000)
 	{
 		m_level->SetLevelMaxFlg(true);
 		m_level->SetLevel3Flg(false); // Level 3のフラグを下ろす
@@ -292,6 +289,17 @@ void C_GameScene::Update()
 		for (auto& b : m_enemyBullets) { b->SetAliveFlg(false); }
 	}
 
+	if (GetAsyncKeyState('Y') & 0x8000)
+	{
+		m_totalScore = 12000;
+
+		if (m_totalScore >= 12000)
+		{
+			m_level->SetLevelMaxFlg(true);
+
+		}
+
+	}
 
 
 
@@ -519,7 +527,7 @@ void C_GameScene::Init()
 	//if (m_level->GetLevelMaxFlg()) {
 		//spawnCount = 15; // MAXレベルは大量！
 	
-	m_maxEnemyCount = 3;
+	m_maxEnemyCount = 5;
 
 	// 決まった数だけループを回す
 	for (int i = 0; i < m_maxEnemyCount; i++)
@@ -576,11 +584,13 @@ void C_GameScene::Init()
 
 	
 
-	m_gameOverTimer = 360;
-	m_gameClearTimer = 360;
+
+
+	m_gameOverTimer = 120;
+	m_gameClearTimer = 120;
 
 	//スコア初期化
-	m_killPoint = 200;
+	m_killPoint = 50;
 	m_totalScore = 0;
 	m_displayScore = 0;
 }
@@ -682,78 +692,78 @@ void C_GameScene::Action()
 	}
 	//===================================================================================
 
-	// 敵の弾とプレイヤーの弾の当たり判定
-	for (auto& eb : m_enemyBullets)
-	{
-		// そもそも敵の弾が生きていないなら判定スキップ
-		if (!eb->GetAliveFlg()) continue;
+	//// 敵の弾とプレイヤーの弾の当たり判定
+	//for (auto& eb : m_enemyBullets)
+	//{
+	//	// そもそも敵の弾が生きていないなら判定スキップ
+	//	if (!eb->GetAliveFlg()) continue;
 
-		for (auto& pb : m_player->GetBullets())
-		{
-			// プレイヤーの弾が生きていないなら判定スキップ
-			if (!pb.active) continue;
+	//	for (auto& pb : m_player->GetBullets())
+	//	{
+	//		// プレイヤーの弾が生きていないなら判定スキップ
+	//		if (!pb.active) continue;
 
-			// 弾と弾の間のベクトルを計算
-			Math::Vector2 diff = eb->GetPos() - pb.pos;
+	//		// 弾と弾の間のベクトルを計算
+	//		Math::Vector2 diff = eb->GetPos() - pb.pos;
 
-			if (diff.Length() < 32.0f)
-			{
+	//		if (diff.Length() < 32.0f)
+	//		{
 
-				// --- 爆発をリストから探して再生 ---
-				for (auto& ex : m_explosions)
-				{
-					if (!ex->GetAliveFlg()) // 空いている爆発エフェクトを探す
-					{
-						ex->SetPos(eb->GetPos());   // 敵の場所に配置
-						ex->SetAliveFlg(true);     // 再生開始！
-						
-						break;
-					}
-				}
+	//			// --- 爆発をリストから探して再生 ---
+	//			for (auto& ex : m_explosions)
+	//			{
+	//				if (!ex->GetAliveFlg()) // 空いている爆発エフェクトを探す
+	//				{
+	//					ex->SetPos(eb->GetPos());   // 敵の場所に配置
+	//					ex->SetAliveFlg(true);     // 再生開始！
+	//					
+	//					break;
+	//				}
+	//			}
 
-				pb.active = false;      // プレイヤーの弾を消す
-				eb->SetAliveFlg(false); // 敵の弾を消す
-				break;                  // 敵の弾ebは消えたので、次の敵弾のループへ
-			}
-		}
-	}
+	//			pb.active = false;      // プレイヤーの弾を消す
+	//			eb->SetAliveFlg(false); // 敵の弾を消す
+	//			break;                  // 敵の弾ebは消えたので、次の敵弾のループへ
+	//		}
+	//	}
+	//}
 
-	if(m_bEnemy->GetAliveFlg())
-	{
-		// --- ボスの弾とプレイヤーの弾の当たり判定 ---
-		for (auto& bb : m_bossBullets) // bb = Boss Bullet
-		{
-			if (!bb->GetAliveFlg()) continue;
+	//if(m_bEnemy->GetAliveFlg())
+	//{
+	//	// --- ボスの弾とプレイヤーの弾の当たり判定 ---
+	//	for (auto& bb : m_bossBullets) // bb = Boss Bullet
+	//	{
+	//		if (!bb->GetAliveFlg()) continue;
 
-			for (auto& pb : m_player->GetBullets())
-			{
-				if (!pb.active) continue;
+	//		for (auto& pb : m_player->GetBullets())
+	//		{
+	//			if (!pb.active) continue;
 
-				Math::Vector2 diff = bb->GetPos() - pb.pos;
+	//			Math::Vector2 diff = bb->GetPos() - pb.pos;
 
-				if (diff.Length() < 32.0f)
-				{
-					pb.active = false;      // プレイヤーの弾を消す
-					bb->SetAliveFlg(false); // ボスの弾を消す
+	//			if (diff.Length() < 32.0f)
+	//			{
+	//				pb.active = false;      // プレイヤーの弾を消す
+	//				bb->SetAliveFlg(false); // ボスの弾を消す
 
-					// --- 爆発をリストから探して再生 ---
-					for (auto& ex : m_explosions)
-					{
-						if (!ex->GetAliveFlg()) // 空いている爆発エフェクトを探す
-						{
-							ex->SetPos(bb->GetPos());   // 敵の場所に配置
-							ex->SetAliveFlg(true);     // 再生開始！
+	//				// --- 爆発をリストから探して再生 ---
+	//				for (auto& ex : m_explosions)
+	//				{
+	//					if (!ex->GetAliveFlg()) // 空いている爆発エフェクトを探す
+	//					{
+	//						ex->SetPos(bb->GetPos());   // 敵の場所に配置
+	//						ex->SetAliveFlg(true);     // 再生開始！
 
-							break;
-						}
-					}
-					// ★ここに爆発エフェクトを出す処理を追加してもOK！
+	//						break;
+	//					}
+	//				}
+	//				// ★ここに爆発エフェクトを出す処理を追加してもOK！
 
-					break;
-				}
-			}
-		}
-	}
+	//				break;
+	//			}
+	//		}
+	//	}
+	//}
 
 
 	//キャラの弾とボスの当たり判定==================================================
@@ -784,7 +794,7 @@ void C_GameScene::Action()
 
 						// 2. 下方向へのオフセット（ずらす量）を設定 (例: 30.0f)
 						// ※値はボスの画像サイズや爆発エフェクトの大きさに合わせて調整してください。
-						float offsetY = 65.0f;
+						float offsetY = 110.0f;
 
 						// 3. Y座標を調整してセット（一般的な2D座標系ではYを引くと下になります）
 						ex->SetPos({ bossPos.x, bossPos.y - offsetY });
@@ -826,7 +836,7 @@ void C_GameScene::Action()
 
 		Math::Vector2 bossBullet = bb->GetPos() - m_player->GetPos();
 
-		if (bossBullet.Length() <= m_charaRadius)
+		if (bossBullet.Length() <= 16)
 		{
 			bb->SetAliveFlg(false);
 

@@ -27,5 +27,11 @@ private:
 	Math::Matrix m_scale;
 	Math::Matrix m_trans;
 	KdTexture m_tex;
+
+	float m_anime;
+	float m_animeSpeed;
+	float m_animeMax;
+	float m_animeReset;
+
 	bool m_aliveFlg = false;
 };

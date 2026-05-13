@@ -116,7 +116,7 @@ void C_Score::UiUpdate()
 void C_Score::UiInit()
 {
     // 合計スコアUIの初期設定
-    m_uiPos = { 340.0f, 150.0f };
+    m_uiPos = { 340.0f, 180.0f };
     m_uiSize = { 1.0f,1.0f };
     m_uiAlpha = 1.0f;
 }
@@ -137,7 +137,7 @@ void C_Score::ScoreUpdate()
 
 void C_Score::ScoreInit()
 {
-    m_scorePos = { 388,185 };
+    m_scorePos = { 380,220 };
     m_scoreSize = { 0.9f,0.9f };
     m_scoreTex.Load("Texture/Score/Score.png");
 }

@@ -58,14 +58,16 @@ void C_Enemy::Shoot(std::vector<std::unique_ptr<C_EnemyBullet>>& bulletList)
 
 			// --- 速度をランダムにする計算 ---
 			// 例：基本の速さ 3.0 に、0.0〜4.0 のランダム値を足す（合計 3.0〜7.0）
-			float randomSpeed = 3.0f + static_cast<float>(rand() % 41) / 10.0f;
+			//float randomSpeed = 4.0f + static_cast<float>(rand() % 5);
+
+			float randomSpeed = 4.0f;
 
 			// 下方向に飛ぶのでマイナスにする
 			b->SetVelocity({ 0.0f, -randomSpeed });
 			// ------------------------------
 
 			b->SetAliveFlg(true);
-			m_shotTimer = 180;
+			m_shotTimer = 60;
 			return;
 		}
 	}

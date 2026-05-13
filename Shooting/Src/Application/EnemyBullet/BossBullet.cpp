@@ -4,7 +4,8 @@ void C_BossBullet::Draw()
 {
 	if (!m_aliveFlg)return;
 	SHADER.m_spriteShader.SetMatrix(m_mat);
-	SHADER.m_spriteShader.DrawTex(&m_tex, Math::Rectangle(0, 0, 7, 24), 1.0f);
+	SHADER.m_spriteShader.DrawTex(&m_tex, Math::Rectangle((int)m_anime * 16, 0, 16, 16), 1.0f);
+
 }
 
 void C_BossBullet::Update()
@@ -28,7 +29,11 @@ void C_BossBullet::Update()
 void C_BossBullet::Init()
 {
 	m_pos = { -50,0 };
-	m_size = { 3.0f,3.0f };
+	m_size = { 1.5f,1.5f };
+	m_anime = 0;
+	m_animeSpeed = 0.1f;
+	m_animeMax = 5.0f;
+	m_animeReset = 0.0f;
 	m_tex.Load("Texture/Bullet/EnemyBullet.png");
 
 }
