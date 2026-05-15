@@ -1,15 +1,20 @@
 #pragma once
 
-class C_Image
+enum class KeyType 
+{
+	Up, Down, Left, Right
+};
+
+class C_Key
 {
 public:
 
-	C_Image(){}
-	~C_Image(){}
+	C_Key() {}
+	~C_Key() {}
 
 	void Draw();
 	void Update();
-	void Init();
+	void Init(KeyType type);
 
 	void SetAliveFlg(bool aliveFlg) { m_aliveFlg = aliveFlg; }
 	bool GetAliveFlg() { return m_aliveFlg; }
@@ -24,13 +29,9 @@ private:
 	KdTexture m_tex;
 
 	float m_alpha;
-	float m_alphaSpeed;
-	float m_alphaMax;
-	float m_alphaMin;
-	float m_delet;
-	float m_alphaReset;
-	
 	bool m_aliveFlg;
+
+	KeyType m_type;
 
 
 };

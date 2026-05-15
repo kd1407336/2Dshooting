@@ -14,6 +14,7 @@ void C_BossBullet::Update()
 	{
 		m_pos += m_velocity;
 
+
 		if (m_pos.y > 300.0f || m_pos.y < -640.0f ||
 			m_pos.x > 300.0f || m_pos.x < -360.0f)
 		{

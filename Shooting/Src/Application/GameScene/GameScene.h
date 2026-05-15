@@ -1,6 +1,5 @@
 #pragma once
 #include "Application/State/State.h"
-#include "Application/Player/Player.h"
 #include "Application/Fade/FadeIn.h"
 #include "Application/Enemy/EnemyBase.h"
 #include "Application/Result/Result.h"
@@ -9,6 +8,7 @@
 #include "Application/Enemy/Enemy.h"
 #include "Application/EnemyBullet/EnemyBullet.h"
 #include "Application/EnemyBullet/BossBullet.h"
+#include "Application/Key/Key.h"
 #include <memory>
 
 class C_Enemy;
@@ -22,7 +22,10 @@ class C_GameClear;
 class C_GameOver;
 class C_GameScreen;
 class C_HomeIcon;
+class C_Image;
+class C_Key;
 class C_Level;
+class C_Player;
 class C_TitleScene;
 class C_Timer;
 class C_Window;
@@ -69,7 +72,8 @@ private:
 	C_Level*		m_level = nullptr;
 	C_BossEnemy*	m_bEnemy = nullptr;
 	C_Window*		m_window = nullptr;
-	
+	C_Image*		m_image = nullptr;
+	C_Key*			m_key = nullptr;
 
 	// 爆発の最大数（画面内に同時に出せる数）
 	static const int m_explosionMax = 10;
@@ -77,7 +81,7 @@ private:
 	std::vector<std::unique_ptr<C_Explosion>> m_explosions;
 	std::vector<std::unique_ptr<C_EnemyBullet>> m_enemyBullets;
 	std::vector<std::unique_ptr<C_BossBullet>> m_bossBullets;
-	static const int m_scoreMax = 11;
+	static const int m_scoreMax = 15;
 	C_Score m_score[m_scoreMax];
 
 	const int m_bulletMax = 30;
@@ -137,6 +141,11 @@ private:
 	bool m_isStarting = true;  
 
 	bool m_GameClear = true;
+
+
+	float m_imageTimer;
+	float m_imageTimerLimit;
+
 
 	std::mt19937 m_mt{ std::random_device{}() }; // クラス作成時に一度だけ初期化
 	std::uniform_int_distribution<int> m_distX{ -610, 250 };

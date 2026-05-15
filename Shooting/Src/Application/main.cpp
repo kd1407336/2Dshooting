@@ -72,7 +72,7 @@ bool Application::Init(int w, int h)
 	// シェーダー初期化
 	SHADER.Init();
 
-	ShowCursor(FALSE);
+	ShowCursor(true);
 
 	//===================================================================
 	// XAudio2

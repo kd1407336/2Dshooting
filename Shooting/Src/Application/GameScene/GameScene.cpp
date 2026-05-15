@@ -4,8 +4,10 @@
 #include "Application/GameScreen/GameScreen.h"
 #include "Application/GameClear/GameClear.h"
 #include "Application/GameOver/GameOver.h"
+#include "Application/Image/Image.h"
 #include "Application/Enemy/BossEnemy.h"
 #include "Application/HomeIcon/HomeIcon.h"
+#include "Application/Player/Player.h"
 #include "Application/Level/Level.h"
 #include "Application/Timer/Timer.h"
 #include "Application/MouseManager/MouseManager.h"
@@ -19,6 +21,7 @@ void C_GameScene::Draw()
 {
 	if (m_gameScreen) { m_gameScreen->Draw(); }
 	if (m_window) { m_window->Draw(); }
+
 
 	CountDownDraw();
 	StartLogoDraw();
@@ -73,7 +76,12 @@ void C_GameScene::Draw()
 		}
 		m_level->LevelMaxDraw();
 	}
-	if (m_bEnemy) { m_bEnemy->Draw(); }
+
+	if( m_imageTimer <= m_imageTimerLimit)
+	{
+		if (m_bEnemy) { m_bEnemy->Draw(); }
+	}
+
 	if (m_gameClear) { m_gameClear->Draw(); }
 	if (m_gameOver) { m_gameOver->Draw(); }
 
@@ -81,6 +89,9 @@ void C_GameScene::Draw()
 	{
 		ex->Draw();
 	}
+
+
+	if (m_image) { m_image->Draw(); }
 
 	if (m_fadeIn) { m_fadeIn->Draw(); }
 	if (m_fadeOut) { m_fadeOut->Draw(); }
@@ -90,6 +101,8 @@ void C_GameScene::Update()
 {
 	g_mouse.Update();
 	m_fadeIn->SetFlg(true);
+
+	if (m_image) { m_image->Update(); }
 
 	//フェードイン更新
 	if (m_fadeIn->GetFlg()) { m_fadeIn->Update(); }
@@ -122,7 +135,25 @@ void C_GameScene::Update()
 		{
 			for (auto& e : m_enemies)
 			{
-				if (e->GetAliveFlg()) { e->Update(); e->Shoot(m_enemyBullets); }
+				if (e->GetAliveFlg()) 
+				{ 
+					e->Update(); e->Shoot(m_enemyBullets); 
+				
+
+					// 画面下端（-360）に到達したかチェック
+					if (e-> GetPos().y <= -360.0f) {
+						// 1. Y座標を上部に戻す
+						float newY = 390.0f;
+
+						// 2. 作成した関数を使って、他の敵と重ならないX座標を取得
+						float newX = GetSafeRandomX();
+
+						// 3. 座標をセットし直す
+						e->SetPos({ newX, newY });
+
+					}
+				
+				}
 			}
 		}
 	}
@@ -143,17 +174,6 @@ void C_GameScene::Update()
 	{
 		m_score[i].Update();
 	}
-
-	/*if (m_bEnemy && !m_bEnemy->GetAliveFlg())
-	{
-		for (auto& e : m_enemies)
-		{
-			if (e->GetAliveFlg())
-			{
-				e->Update();
-			}
-		}
-	}*/
 
 
 	for (auto& e : m_enemies)
@@ -197,10 +217,84 @@ void C_GameScene::Update()
 	if (m_gameOver) { m_gameOver->Update(); }
 
 
+	
+	// ★ ここに「補充チェック」を入れる！
+	// 現在のリストの数が上限より少なければ、足りない分だけ新しく作る
+	if (m_enemies.size() < (size_t)m_maxEnemyCount)
+	{
+		float randX = GetSafeRandomX();
+		auto enemy = std::make_unique<C_Enemy>();
+		enemy->Init();
+		enemy->SetPos({ randX, 400.0f }); // 画面の上から出す
+		m_enemies.push_back(std::move(enemy));
+	}
+
+
+
+	// --- Update関数内のスコア判定部分 ---
+
+// Level 2
+	if (m_totalScore >= 2000)
+	{
+		m_level->SetLevel2Flg(true);
+		m_maxEnemyCount = 9;  // 上限アップ
+	}
+
+	// Level 3
+	if (m_totalScore >= 7000)
+	{
+		m_level->SetLevel3Flg(true);
+		m_maxEnemyCount = 13; // 上限アップ
+	}
+
+
+	// --- Level Max ---
+	if (m_totalScore >= 12000)
+	{
+		m_level->SetLevelMaxFlg(true);
+		m_level->SetLevel3Flg(false); // Level 3のフラグを下ろす
+
+		
+		m_imageTimer--;
+
+		if(m_imageTimer >= m_imageTimerLimit)
+		{
+			m_image->SetAliveFlg(true);
+		}
+		else
+		{
+			m_image->SetAliveFlg(false);
+		}
+
+		m_maxEnemyCount = 0; // ★ボス戦なので雑魚の新規沸きを止める（0にする）
+
+		// 雑魚と弾の一掃
+		for (auto& e : m_enemies) { e->SetAliveFlg(false); }
+		for (auto& b : m_enemyBullets) { b->SetAliveFlg(false); }
+	}
+
+	if (GetAsyncKeyState('Y') & 0x8000)
+	{
+		m_totalScore = 12000;
+
+		if (m_totalScore >= 12000)
+		{
+			m_level->SetLevelMaxFlg(true);
+
+		}
+
+	}
+
+
 	// ボスの更新
-	if (m_bEnemy && m_bEnemy->GetAliveFlg())
+	if (m_bEnemy && m_imageTimer <= m_imageTimerLimit)
 	{
 		m_bEnemy->Update();
+
+		if (m_bEnemy)
+		{
+			m_bEnemy->SetAliveFlg(true);
+		}
 
 		// 現在のHP割合を計算（1.0 = 満タン, 0.5 = 半分）
 		float hpRate = m_bEnemy->GetHp() / m_bEnemy->GetHpMax();
@@ -208,18 +302,18 @@ void C_GameScene::Update()
 		if (hpRate > 0.7f)
 		{
 			// 体力 70% 以上の時：通常の3方向ショット
-			m_bEnemy->ShootCircleStep(m_bossBullets);
+			m_bEnemy->Shoot3WayStep(m_bossBullets);
 		}
 		else if (hpRate > 0.3f)
 		{
 			// 体力 30% ～ 70% の時：円形ショット
 			m_bEnemy->ShootCircleStep(m_bossBullets);
-			m_bEnemy->ShootAimNWay(m_bossBullets,m_player->GetPos());
 		}
 		else if (hpRate > 0.15f)
 		{
+
 			// 【発狂モード】3Wayと円形を同時に呼ぶ
-			m_bEnemy->Shoot3WayStep(m_bossBullets);
+			m_bEnemy->ShootAimNWay(m_bossBullets, m_player->GetPos());
 			m_bEnemy->ShootCircleStep(m_bossBullets);
 		}
 
@@ -241,64 +335,6 @@ void C_GameScene::Update()
 		{
 			b->SetAliveFlg(false);
 		}
-	}
-
-	// --- Update関数内のスコア判定部分 ---
-
-// Level 2
-	if (m_totalScore >= 2000)
-	{
-		m_level->SetLevel2Flg(true);
-		m_maxEnemyCount = 9;  // 上限アップ
-	}
-
-	// Level 3
-	if (m_totalScore >= 7000)
-	{
-		m_level->SetLevel3Flg(true);
-		m_maxEnemyCount = 13; // 上限アップ
-	}
-
-	// ★ ここに「補充チェック」を入れる！
-	// 現在のリストの数が上限より少なければ、足りない分だけ新しく作る
-	if (m_enemies.size() < (size_t)m_maxEnemyCount)
-	{
-		float randX = GetSafeRandomX();
-		auto enemy = std::make_unique<C_Enemy>();
-		enemy->Init();
-		enemy->SetPos({ randX, 400.0f }); // 画面の上から出す
-		m_enemies.push_back(std::move(enemy));
-	}
-
-
-	// --- Level Max ---
-	if (m_totalScore >= 12000)
-	{
-		m_level->SetLevelMaxFlg(true);
-		m_level->SetLevel3Flg(false); // Level 3のフラグを下ろす
-
-		m_maxEnemyCount = 0; // ★ボス戦なので雑魚の新規沸きを止める（0にする）
-
-		if (m_bEnemy) 
-		{
-			m_bEnemy->SetAliveFlg(true);
-		}
-
-		// 雑魚と弾の一掃
-		for (auto& e : m_enemies) { e->SetAliveFlg(false); }
-		for (auto& b : m_enemyBullets) { b->SetAliveFlg(false); }
-	}
-
-	if (GetAsyncKeyState('Y') & 0x8000)
-	{
-		m_totalScore = 12000;
-
-		if (m_totalScore >= 12000)
-		{
-			m_level->SetLevelMaxFlg(true);
-
-		}
-
 	}
 
 
@@ -340,7 +376,7 @@ void C_GameScene::Update()
 	if (m_player->GetHp() <= 0)
 	{
 		m_player->SetAliveFlg(false);
-		m_GameClear = false;
+		m_isGameOver = true;
 	}
 
 	if (m_bEnemy->GetHp() <= 0)
@@ -349,6 +385,7 @@ void C_GameScene::Update()
 		m_isGameClear = true;
 		m_GameClear = true;
 	}
+
 
 	// --- ゲームオーバー中の処理 ---
 	if (m_isGameOver)
@@ -486,6 +523,9 @@ void C_GameScene::Init()
 	m_level = new C_Level();
 	m_bEnemy = new C_BossEnemy();
 	m_window = new C_Window();
+	
+	// 0:上, 1:下, 2:左, 3:右 と決めて初期化
+	KeyType types[] = { KeyType::Up, KeyType::Down, KeyType::Left, KeyType::Right };
 
 	CountDownInit();
 
@@ -506,6 +546,13 @@ void C_GameScene::Init()
 	if (m_window) { m_window->Init(); }
 	if (m_gameClear) { m_gameClear->Init(); }
 	if (m_gameOver) { m_gameOver->Init(); }
+
+	if(m_imageTimer <= m_imageTimerLimit)
+	{
+		m_image = new C_Image();
+		if (m_image) { m_image->Init(); }
+	}
+
 
 	for (int i = 0; i < m_explosionMax; i++)
 	{
@@ -558,7 +605,7 @@ void C_GameScene::Init()
 
 	m_bossBullets.clear();
 
-	int bossBulletMax = 200;
+	int bossBulletMax = 400;
 	for (int i = 0; i < bossBulletMax; i++)
 	{
 		auto bullet = std::make_unique<C_BossBullet>();
@@ -583,7 +630,8 @@ void C_GameScene::Init()
 	m_iconRadius = 64;
 
 	
-
+	m_imageTimer = 180.0f;
+	m_imageTimerLimit = 0.0f;
 
 
 	m_gameOverTimer = 120;
@@ -1023,7 +1071,7 @@ void C_GameScene::Release()
 	if (m_level) { delete m_level; m_level = nullptr; }
 	if (m_bEnemy) { delete m_bEnemy; m_bEnemy = nullptr; }
 	if (m_window) { delete m_window; m_window = nullptr; }
-
+	if (m_image) { delete m_image;m_image = nullptr; }
 
 	/*for (auto it = m_enemies.begin();it != m_enemies.end();)
 	{

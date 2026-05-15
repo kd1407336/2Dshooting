@@ -112,6 +112,9 @@
     <Filter Include="Src\Application\Image">
       <UniqueIdentifier>{d0fb5e67-d0ea-4b38-8e7e-61ce6a567471}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Src\Application\Key">
+      <UniqueIdentifier>{2ae42fd4-2f16-444f-a1ac-f08d9e0769a6}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Pch.h">
@@ -286,7 +289,10 @@
       <Filter>Src\Application\Result</Filter>
     </ClInclude>
     <ClInclude Include="Src\Application\Image\Image.h">
-      <Filter>Src\Application\MouseManager</Filter>
+      <Filter>Src\Application\Image</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Application\Key\Key.h">
+      <Filter>Src\Application\Key</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -430,6 +436,9 @@
     </ClCompile>
     <ClCompile Include="Src\Application\Image\Image.cpp">
       <Filter>Src\Application\Image</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Application\Key\Key.cpp">
+      <Filter>Src\Application\Key</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

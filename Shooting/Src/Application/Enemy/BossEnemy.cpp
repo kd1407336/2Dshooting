@@ -4,18 +4,23 @@
 
 void C_BossEnemy::Draw()
 {
-	if (m_aliveFlg)
-	{
-		SHADER.m_spriteShader.SetMatrix(m_mat);
-		SHADER.m_spriteShader.DrawTex(&m_tex, Math::Rectangle(0, 0, 128, 128), 1.0f);
-	}
+
+    if (!m_aliveFlg) return;
+
+    SHADER.m_spriteShader.SetMatrix(m_mat);
+    SHADER.m_spriteShader.DrawTex(&m_tex, Math::Rectangle(0, 0, 128, 128), 1.0f);
 
     HpDraw();
-
 }
 
 void C_BossEnemy::Update()
 {
+
+    HpUpdate();
+
+    m_trans = Math::Matrix::CreateTranslation(m_pos.x, m_pos.y, 0);
+    m_scale = Math::Matrix::CreateScale(m_size.x, m_size.y, 0);
+    m_mat = m_scale * m_trans;
 
     if (!m_aliveFlg) return;
 
@@ -46,14 +51,6 @@ void C_BossEnemy::Update()
         m_pos.y = 160 + sinf(m_moveTimer * 0.5f) * 15.0f;
         break;
     }
-
-    HpUpdate();
-
-    
-
-	m_trans = Math::Matrix::CreateTranslation(m_pos.x, m_pos.y, 0);
-	m_scale = Math::Matrix::CreateScale(m_size.x, m_size.y, 0);
-	m_mat = m_scale * m_trans;
 }
 
 void C_BossEnemy::Init()
@@ -61,7 +58,7 @@ void C_BossEnemy::Init()
 	m_pos = { -110,460 };
 	m_size = { 2.8f,2.8f };
     m_shotTimer = 60; // ← これを追加（出現してから1秒後に発射開始）
-    m_hp = 50;
+    m_hp = 200;
 	m_tex.Load("Texture/Enemy/BossEnemy.png");
 	m_aliveFlg = false;
 	m_hitFlg = false;
@@ -173,7 +170,7 @@ void C_BossEnemy::HpUpdate()
 
 void C_BossEnemy::HpInit()
 {
-    m_hpMax = 50.0f; // 例：プレイヤーより多め
+    m_hpMax = 200.0f; // 例：プレイヤーより多め
     m_hp = m_hpMax;
     m_hpDraw = m_hpMax;
 
@@ -276,7 +273,7 @@ void C_BossEnemy::ShootCircleStep(std::vector<std::unique_ptr<C_BossBullet>>& li
         }
     }
 
-    m_shotTimer = 30; // 次の発射までの間隔
+    m_shotTimer = 15; // 次の発射までの間隔
 }
 
 

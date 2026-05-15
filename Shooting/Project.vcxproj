@@ -175,6 +175,7 @@
     <ClInclude Include="Src\Application\GameScreen\GameScreen.h" />
     <ClInclude Include="Src\Application\HomeIcon\HomeIcon.h" />
     <ClInclude Include="Src\Application\Image\Image.h" />
+    <ClInclude Include="Src\Application\Key\Key.h" />
     <ClInclude Include="Src\Application\Level\Level.h" />
     <ClInclude Include="Src\Application\MouseManager\MouseManager.h" />
     <ClInclude Include="Src\Application\Player\Player.h" />
@@ -227,6 +228,7 @@
     <ClCompile Include="Src\Application\GameScreen\GameScreen.cpp" />
     <ClCompile Include="Src\Application\HomeIcon\HomeIcon.cpp" />
     <ClCompile Include="Src\Application\Image\Image.cpp" />
+    <ClCompile Include="Src\Application\Key\Key.cpp" />
     <ClCompile Include="Src\Application\Level\Level.cpp" />
     <ClCompile Include="Src\Application\MouseManager\MouseManager.cpp" />
     <ClCompile Include="Src\Application\Player\Player.cpp" />

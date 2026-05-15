@@ -157,21 +157,21 @@ void C_ResultScene::TotalTimerDraw()
 void C_ResultScene::TotalTimerUpdate()
 {
 	// フレーム数で定義（60fps想定）
-	const int SEC_30 = 30 * 60; // 1800フレーム
-	const int SEC_60 = 60 * 60; // 3600フレーム
-	const int SEC_90 = 90 * 60; // 5400フレーム
+	const int SEC_60 = 60 * 60; // 1800フレーム
+	const int SEC_90 = 90 * 60; // 3600フレーム
+	const int SEC_120 = 120 * 60; // 5400フレーム
 
-	if (m_resultFrame <= SEC_30)
+	if (m_resultFrame <= SEC_60)
 	{
 		// 0秒 ～ 30.00秒まで
 		m_timerBonus = 10000;
 	}
-	else if (m_resultFrame <= SEC_60)
+	else if (m_resultFrame <= SEC_90)
 	{
 		// 30.01秒 ～ 60.00秒まで（31秒以上を含む区間）
 		m_timerBonus = 8000;
 	}
-	else if (m_resultFrame <= SEC_90)
+	else if (m_resultFrame <= SEC_120)
 	{
 		// 60.01秒 ～ 90.00秒まで
 		m_timerBonus = 5000;

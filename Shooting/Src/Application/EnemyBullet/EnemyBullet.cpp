@@ -40,7 +40,7 @@ void C_EnemyBullet::Init()
 	m_pos = { 0,0 };
 	m_size = { 1.0f,1.0f };
 	m_anime = 0;
-	m_animeSpeed = 0.1f;
+	m_animeSpeed = 0.15f;
 	m_animeMax = 5.0f;
 	m_animeReset = 0.0f;
 	m_tex.Load("Texture/Bullet/EnemyBullet.png");
